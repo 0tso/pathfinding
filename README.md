@@ -12,9 +12,9 @@ The following programs must be installed before building the application (the it
 * (_Make (for building)_)
 * [CMake](https://cmake.org/) (for build automation & generation)
 
-If you want to use a package manager, install [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started).
+If you want to use a C++ package manager, install [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started).
 
-_(Recommended on Linux)_ Building without a package manager requires manually installing the only dependency of the project: [SFML](https://www.sfml-dev.org/). On Debian-like distributions, for example, this can be done with the following command:
+_(Recommended on Linux)_ Building without a C++ package manager requires manually installing the only dependency of the project: [SFML](https://www.sfml-dev.org/). On Debian-like distributions, for example, this can be done with the following command:
 ```
 sudo apt install libsfml-dev
 ```
@@ -26,7 +26,7 @@ To build the project, execute the following commands in the project root directo
 cmake --preset=release
 cmake --build build --config Release
 ```
-With vcpkg, the commands would be:
+With vcpkg the corresponding commands are:
 ```
 cmake --preset=vcpkg
 cmake --build build --config Release
@@ -36,3 +36,6 @@ In case of [missing system dependencies](https://learn.microsoft.com/en-us/vcpkg
 <hr>
 
 After building, the executable `pathfinding` can be found and executed in the newly created `build` subdirectory.
+
+## Documentation
+Documentation provided in the [docs](./docs/) folder.
