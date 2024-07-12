@@ -12,7 +12,7 @@ Käytetty ohjelmointikieli: C++
 
 Muut hallitut ohjelmointikielet: C, Python, Javascript. Tämän lisäksi Java ja C# varmaan luettavissa koska syntaksiltaan läheisiä C++:aan ja olen joskus aikoinani niihin pinnallisesti perehtynyt.
 
-Toteutan työssä A* ja jump point search (JPS) -algoritmit. Vertailen algoritmien tehokkuutta ja esitän niiden toiminnan visuaalisesti kartalla.
+Toteutan työssä A* ja jump point search (JPS) -algoritmit. Vertailen algoritmien tehokkuutta ja esitän niiden toiminnan visuaalisesti kaksiuloitteisella neliöpohjaisella kartalla.
 
 Algoritmit ratkaisevat reitinhakuongelman: kuinka löytää lyhyin ja tehokkain reitti kohteesta A kohteeseen B verkossa. Jump point search -algoritmi käyttää hyväkseen erityisesti tasaisten, ruudukkomaisten verkkojen erityisominaisuuksia, eli se soveltuu esimerkiksi peleihin. Oma motivaatio reitinhakualgoritmien implementoimiseen tuleekin juuri pelien vaatimuksista.
 
@@ -31,6 +31,8 @@ https://en.wikipedia.org/wiki/A*_search_algorithm
 https://en.wikipedia.org/wiki/Jump_point_search
 
 https://zerowidth.com/2013/a-visual-explanation-of-jump-point-search/
+
+http://users.cecs.anu.edu.au/~dharabor/data/papers/harabor-grastien-aaai11.pdf
 
 
 ### Muita reitinhakuun liittyviä algoritmeja ja ideoita tutkittavaksi, jos aikaa jää
