@@ -12,8 +12,8 @@ int main()
 
     State state = {
         .map = {},
-        .width = 500,
-        .height = 500
+        .width = 1000,
+        .height = 1000
     };
 
     View view = {

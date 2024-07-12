@@ -16,10 +16,7 @@ namespace Renderer
         sf::Vector2f{0.0f, 0.0f},
         sf::Vector2f{0.0f, 1.0f},
         sf::Vector2f{1.0f, 1.0f},
-
-        sf::Vector2f{0.0f, 0.0f},
-        sf::Vector2f{1.0f, 1.0f},
-        sf::Vector2f{1.0f, 0.0f}
+        sf::Vector2f{1.0f, 0.0f},
     };
 
     sf::Color node_colors[] = {
@@ -33,7 +30,7 @@ namespace Renderer
 
     void render(sf::RenderWindow& window, const State& state, const View& view)
     {
-        const auto vert_amount = state.height * state.width * 6;
+        const auto vert_amount = state.height * state.width * 4;
 
         // Fill the vertex buffer if it's not big enough
         if(vertices.size() != vert_amount)
@@ -51,15 +48,15 @@ namespace Renderer
             int x = i % state.width;
 
             auto color = node_colors[state.map[i]];
-            for(int v = 0; v < 6; ++v)
+            for(int v = 0; v < 4; ++v)
             {
-                int index = i * 6 + v;
+                int index = i * 4 + v;
                 float v_x = (quad[v].position.x + x) * pixel_size + transform.x;
                 float v_y = (quad[v].position.y + y) * pixel_size + transform.y;
                 vertices[index] = {sf::Vector2f{v_x, v_y}, color};
             }
         }
 
-        window.draw(&vertices[0], vertices.size(), sf::Triangles);
+        window.draw(&vertices[0], vertices.size(), sf::Quads);
     }
 }
