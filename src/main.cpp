@@ -10,6 +10,8 @@
 
 #include "state.hpp"
 #include "renderer.hpp"
+#include "algorithms/algorithm.hpp"
+#include "algorithms/a_star.hpp"
 
 State global_state;
 bool pathfinding = false;
@@ -33,6 +35,7 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
 {
     window->setActive(true);
     window->setKeyRepeatEnabled(false);
+    window->setVerticalSyncEnabled(true);
     sf::View view = window->getDefaultView();
 
     view.setCenter(100, 100);
@@ -132,17 +135,50 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
     }
 }
 
-void pathfinding_loop(std::function<void(void)> algo,
+void pathfinding_loop(Algorithm* algo,
                         State* state, State* render_state,
-                        std::mutex render_mut, std::chrono::duration<int, std::ratio<1, 1000>> sleep_time)
+                        std::mutex* render_mut, std::chrono::duration<int, std::milli> sleep_time)
 {
+    algo->init(state);
 
+    Algorithm::Result::Type res;
+    sf::Clock timer;
+    while((res = algo->update()) == Algorithm::Result::Type::EXECUTING)
+    {
+        if(sleep_time != std::chrono::duration<int, std::milli>::zero())
+        {
+            render_mut->lock();
+            render_state->map = state->map;
+            render_mut->unlock();
+            std::this_thread::sleep_for(sleep_time);
+        }
+    }
+    auto result = algo->get_result();
+    auto elapsed = timer.restart().asMicroseconds();
+
+    render_mut->lock();
+    render_state->map = state->map;
+    render_mut->unlock();
+
+    if(result.type == Algorithm::Result::Type::FAILURE)
+    {
+        std::cout << "no path found." << std::endl;
+    } else
+    {
+        std::cout << "found path with length " << result.length;
+        if(sleep_time == std::chrono::duration<int, std::milli>::zero())
+        {
+            std::cout << " and elapsed time " << elapsed << " microseconds.";
+        }
+        std::cout << std::endl;
+    }
 }
+
+Algorithm* a_star = new AStar();
 
 int main()
 {
     sf::RenderWindow window{sf::VideoMode{2000, 1500}, "Pathfinding visualization"};
-    window.setVerticalSyncEnabled(true);
     window.setActive(false);
 
     global_state = {
@@ -185,6 +221,32 @@ int main()
         {
             window.close();
             render.join();
+        }
+        if(first == "start")
+        {
+            auto algo_name = get_next_token();
+            Algorithm* algo;
+            if(algo_name == "A*")
+                algo = a_star;
+            else
+            {
+                std::cout << "unknown algorithm." << std::endl;
+                continue;
+            }
+
+            std::chrono::duration<int, std::milli> sleep_duration;
+            std::string str;
+            if( (str = get_next_token()).empty() )
+            {
+                sleep_duration = std::chrono::duration<int, std::milli>::zero();
+            } else
+            {
+                sleep_duration = std::chrono::milliseconds(std::stoi(str));
+            }
+            pathfinding = true;
+            std::thread t{pathfinding_loop, algo, &global_state, &render_state, &render_update_mutex, sleep_duration};
+            t.join();
+            pathfinding = false;
         }
     }
 
