@@ -13,6 +13,17 @@ int flatten(int width, int x, int y)
     return y * width + x;
 }
 
+/**
+ * Expands the input node index into a pair of coordinates (x, y).
+ * The inverse function of the above flatten()
+ */
+std::pair<int, int> expand(int width, int idx)
+{
+    return {idx % width, idx / width};
+}
+
+
+
 void AStar::init(State* s)
 {
     state = s;
@@ -112,9 +123,7 @@ Algorithm::Result::Type AStar::update()
     auto [approx_dist, node_idx] = open.top();
     open.pop();
 
-    int x = node_idx % state->width;
-    int y = node_idx / state->width;
-
+    auto [x, y] = expand(state->width, node_idx);
     auto& node = nodes[node_idx];
 
     if(node.status == InternalNode::Status::EXAMINED)
@@ -126,6 +135,7 @@ Algorithm::Result::Type AStar::update()
     node.status = InternalNode::Status::EXAMINED;
     result.expanded++;
 
+    // Is the current node the first node? If not, set it to VISITED
     if(node.prev != std::numeric_limits<node_index>::infinity())
     {
         state->map[node_idx] = Node::VISITED;
@@ -134,17 +144,15 @@ Algorithm::Result::Type AStar::update()
     auto amount_neighbours = get_neighbours(x, y);
     for(int i = 0; i < amount_neighbours; ++i)
     {
-        auto [neighbour_idx, diagonal] = neighbours[i];
-        auto& neighbour     = nodes[neighbour_idx];
-        auto neighbour_x    = neighbour_idx % state->width;
-        auto neighbour_y    = neighbour_idx / state->width;
+        auto [neighbour_idx, is_diagonal] = neighbours[i];
+        auto& neighbour = nodes[neighbour_idx];
+        auto [neighbour_x, neighbour_y] = expand(state->width, neighbour_idx);
         
-        // All perpendicular neighbours are one unit of distance away,
-        // and the diagonal members are sqrt(2) units of distance away.
-        float new_dist = node.distance + (diagonal ? 1.414213f : 1.0f);
+        // All perpendicular neighbours are one unit of distance away
+        // and all the diagonal neigbours are sqrt(2) units of distance away.
+        float new_dist = node.distance + (is_diagonal ? 1.414213f : 1.0f);
         if(new_dist < neighbour.distance)
         {
-
             // Check if the neigbour is the end
             if(neighbour_x == state->end.x && neighbour_y == state->end.y)
             {
@@ -161,8 +169,7 @@ Algorithm::Result::Type AStar::update()
                     {
                         break;
                     }
-                    x = prev_idx % state->width;
-                    y = prev_idx / state->width;
+                    auto [x, y] = expand(state->width, prev_idx);
                     result.path.emplace_back(x, y);
                     state->map[prev_idx] = Node::PATH;
                     prev_idx = prev_node.prev;

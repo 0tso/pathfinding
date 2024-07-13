@@ -6,7 +6,7 @@ The requirements specification is provided in Finnish for the course _Aineopinto
 
 Opinto-ohjelma: tietojenkäsittelytieteen kandiohjelma
 
-Projektin kieli on yleisesti englanti, mutta määrittelydokumentti sekä mahdollisesti jokin muu osa (koodin ulkoisesta) dokumentaatiosta kirjoitetaan suomeksi.
+Projektin kieli on yleisesti englanti, mutta määrittelydokumentti sekä jotkut muut ei ohjelman käyttämiseen tai tutkimiseen liittyvistä dokumenteista kuten viikkoraportit kirjoitetaan suomeksi.
 
 Käytetty ohjelmointikieli: C++
 
