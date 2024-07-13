@@ -12,7 +12,8 @@ enum Node : uint8_t
     START       = 2,
     END         = 3,
     VISITED     = 4,
-    SAVED       = 5
+    SAVED       = 5,
+    PATH        = 6
 };
 
 struct State

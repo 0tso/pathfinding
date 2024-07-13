@@ -18,7 +18,9 @@ Algoritmit ratkaisevat reitinhakuongelman: kuinka löytää lyhyin ja tehokkain 
 
 Pelifokuksen ja JPS-algoritmin käytön takia verkon kaikkien reunojen hinta / paino on sama. 
 
-Pääohjelma on visuaalinen: se näyttää käyttäjälle kartan, johon käyttäjä voi piirtää esteitä sekä asettaa lähtö- ja loppupisteet. Käyttäjä voi myös lopulta tiettyjä nappeja / näppäimiä painamalla suorittaa tietyt reitinhakualgoritmit. Suorittaessa & suorituksen jälkeen ohjelma näyttää visuaalisesti kiinnostavia reitinhaun ominaisuuksia (esimerkiksi löydetty polku, tutkitut solmut, jne.) Kartta voidaan myös ladata ja tulkita suoraan kuvatiedostosta, joka ohjelmalle voidaan antaa komentoriviparametrina.
+Pääohjelma on visuaalinen: se näyttää käyttäjälle kartan, johon käyttäjä voi piirtää esteitä sekä asettaa lähtö- ja loppupisteet. Käyttäjä voi myös lopulta konsoliin tietyt komennot syöttämällä suorittaa halutun reitinhakualgoritmin. Suorittaessa & suorituksen jälkeen ohjelma näyttää visuaalisesti kiinnostavia reitinhaun ominaisuuksia (esimerkiksi löydetty polku, tutkitut solmut, jne.) Kartta voidaan myös ladata ja tulkita suoraan kuvatiedostosta, joka ohjelmalle voidaan antaa komentoriviparametrina.
+
+Visuaalisen pääohjelman lisäksi voidaan komentoriviltä suorittaa testiohjelma, joka suorittaa yksikkötestit, tarkistaa algoritmien paikkaansapitävyyden ja mittaa useassa eri "skenaariossa" A* ja JPS -algoritmien nopeutta.
 
 A*-algoritmin huonoimman tilanteen aikavaatimus on O(b^d), jossa `b` on haarautumiskerroin eli solmun "synnyttämien" jälkeläisten keskimääräinen lukumäärä, ja `d` on lyhyimmän polun pituus. Tilavaatimus on samanlainen.
 
