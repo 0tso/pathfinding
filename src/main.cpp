@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <mutex>
 #include <thread>
 #include <functional>
@@ -14,14 +15,39 @@ State global_state;
 bool pathfinding = false;
 
 
+sf::Vector2i get_mouse_world_coords(const sf::RenderWindow& window)
+{
+    auto mouse_pos = sf::Mouse::getPosition(window);
+    auto world_coords = window.mapPixelToCoords(mouse_pos);
+    int x = (int)world_coords.x;
+    int y = (int)world_coords.y;
+    return {x, y};
+}
+
+bool check_coords(const State& state, int x, int y)
+{
+    return x >= 0 && x < state.width && y >= 0 && y < state.height;
+}
+
 void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
 {
     window->setActive(true);
+    window->setKeyRepeatEnabled(false);
     sf::View view = window->getDefaultView();
 
     view.setCenter(100, 100);
     view.zoom(0.01);
     window->setView(view);
+
+    auto set_node = [&](int x, int y, Node type)
+    {
+        if(!pathfinding && check_coords(*state, x, y))
+        {
+            int index = y * global_state.width + x;
+            global_state.map[index] = type;
+            state->map[index] = type;
+        }
+    };
 
     sf::Clock clock;
     while(window->isOpen())
@@ -54,6 +80,23 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
                     window->setView(view);
                     break;
                 }
+                case sf::Event::KeyPressed:
+                {
+                    if(event.key.code == sf::Keyboard::Q)
+                    {
+                        auto [x, y] = get_mouse_world_coords(*window);
+                        set_node(global_state.begin.x, global_state.begin.y, Node::UNVISITED);
+                        set_node(x, y, Node::START);
+                        global_state.begin = {x, y};
+                    }
+                    if(event.key.code == sf::Keyboard::E)
+                    {
+                        auto [x, y] = get_mouse_world_coords(*window);
+                        set_node(global_state.end.x, global_state.end.y, Node::UNVISITED);
+                        set_node(x, y, Node::END);
+                        global_state.end = {x, y};
+                    }
+                }
             }
         }
 
@@ -68,21 +111,16 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
                 view.move(0, delta * 100.0f);
             window->setView(view);
-            
+
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
-                auto mouse_pos = sf::Mouse::getPosition(*window);
-                auto world_coords = window->mapPixelToCoords(mouse_pos);
-                int x = (int)world_coords.x;
-                int y = (int)world_coords.y;
-
-                if(!pathfinding && x >= 0 && x < state->width
-                    && y >= 0 && y < state->height)
-                {
-                    int index = y * global_state.width + x;
-                    global_state.map[index] = Node::WALL;
-                    state->map[index] = Node::WALL;
-                }
+                auto [x, y] = get_mouse_world_coords(*window);
+                set_node(x, y, Node::WALL);
+            }
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
+            {
+                auto [x, y] = get_mouse_world_coords(*window);
+                set_node(x, y, Node::UNVISITED);
             }
         }
 

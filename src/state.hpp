@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <SFML/System/Vector2.hpp>
 
 enum Node : uint8_t
 {
@@ -18,6 +19,9 @@ struct State
 {
     std::vector<Node> map;
     int width, height;
+
+    sf::Vector2i begin;
+    sf::Vector2i end;
 };
 
 #endif
