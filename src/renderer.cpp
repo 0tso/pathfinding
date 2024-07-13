@@ -1,15 +1,13 @@
 #include <SFML/Graphics.hpp>
 
 #include <vector>
+#include <cmath>
 
 #include "renderer.hpp"
 #include "state.hpp"
-#include "view.hpp"
 
 namespace Renderer
 {
-    constexpr int DEFAULT_PIXEL_SIZE = 2;
-
     std::vector<sf::Vertex> vertices;
 
     sf::Vertex quad[] = {
@@ -28,7 +26,7 @@ namespace Renderer
         sf::Color{100, 100, 100}
     };
 
-    void render(sf::RenderWindow& window, const State& state, const View& view)
+    void render(sf::RenderWindow& window, const State& state)
     {
         const auto vert_amount = state.height * state.width * 4;
 
@@ -37,9 +35,6 @@ namespace Renderer
         {
             vertices = std::vector<sf::Vertex>(vert_amount);
         }
-
-        float pixel_size = DEFAULT_PIXEL_SIZE * view.zoom;
-        sf::Vector2f transform = view.movement;
 
         // Assign the vertex data
         for(int i = 0; i < state.width * state.height; ++i)
@@ -51,8 +46,8 @@ namespace Renderer
             for(int v = 0; v < 4; ++v)
             {
                 int index = i * 4 + v;
-                float v_x = (quad[v].position.x + x) * pixel_size + transform.x;
-                float v_y = (quad[v].position.y + y) * pixel_size + transform.y;
+                float v_x = (quad[v].position.x + x);
+                float v_y = (quad[v].position.y + y);
                 vertices[index] = {sf::Vector2f{v_x, v_y}, color};
             }
         }
