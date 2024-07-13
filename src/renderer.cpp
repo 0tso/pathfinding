@@ -22,8 +22,8 @@ namespace Renderer
         sf::Color::Black,
         sf::Color::Blue,
         sf::Color::Red,
-        sf::Color{50, 50, 50},
-        sf::Color{100, 100, 100}
+        sf::Color{150, 150, 150},
+        sf::Color{75, 75, 75}
     };
 
     void render(sf::RenderWindow& window, const State& state)

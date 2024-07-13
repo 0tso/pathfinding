@@ -16,6 +16,16 @@
 State global_state;
 bool pathfinding = false;
 
+void remove_temp(State& state)
+{
+    for(int i = 0; i < state.height * state.width; ++i)
+    {
+        if(state.map[i] == Node::VISITED || state.map[i] == Node::SAVED)
+        {
+            state.map[i] = Node::UNVISITED;
+        }
+    }
+}
 
 sf::Vector2i get_mouse_world_coords(const sf::RenderWindow& window)
 {
@@ -176,20 +186,53 @@ void pathfinding_loop(Algorithm* algo,
 
 Algorithm* a_star = new AStar();
 
-int main()
+int main(int argc, char** argv)
 {
     sf::RenderWindow window{sf::VideoMode{2000, 1500}, "Pathfinding visualization"};
     window.setActive(false);
 
-    global_state = {
-        .map = {},
-        .width = 250,
-        .height = 250
-    };
-
-    for(int i = 0; i < global_state.width * global_state.height; ++i)
+    if(argc > 1)
     {
-        global_state.map.push_back(Node::UNVISITED);
+        // Load a map from an image
+        sf::Image img;
+        img.loadFromFile(argv[1]);
+        auto [width, height] = img.getSize();
+        global_state.width = width;
+        global_state.height = height;
+        global_state.map.reserve(width * height);
+        for(int y = 0; y < height; ++y)
+        {
+            for(int x = 0; x < width; ++x)
+            {
+                auto col = img.getPixel(x, y);
+                if(col == sf::Color::White)
+                    global_state.map.push_back(Node::UNVISITED);
+                else if(col == sf::Color::Blue)
+                {
+                    global_state.map.push_back(Node::START);
+                    global_state.begin = {x, y};
+                }
+                else if(col == sf::Color::Red)
+                {
+                    global_state.map.push_back(Node::END);
+                    global_state.end = {x, y};
+                }
+                else
+                    global_state.map.push_back(Node::WALL);
+            }
+        }
+
+    } else
+    {
+        global_state = {
+            .map = {},
+            .width = 250,
+            .height = 250
+        };
+        for(int i = 0; i < global_state.width * global_state.height; ++i)
+        {
+            global_state.map.push_back(Node::UNVISITED);
+        }
     }
 
     State render_state{global_state};
@@ -207,7 +250,11 @@ int main()
         {
             auto pos = i.find(' ');
             if(pos == std::string::npos)
-                return i;
+            {
+                auto temp = i;
+                i.clear();
+                return temp;
+            }
             else
             {
                 auto token = i.substr(0, pos);
@@ -224,6 +271,11 @@ int main()
         }
         if(first == "start")
         {
+            remove_temp(global_state);
+            render_update_mutex.lock();
+            remove_temp(render_state);
+            render_update_mutex.unlock();
+
             auto algo_name = get_next_token();
             Algorithm* algo;
             if(algo_name == "A*")
@@ -236,7 +288,7 @@ int main()
 
             std::chrono::duration<int, std::milli> sleep_duration;
             std::string str;
-            if( (str = get_next_token()).empty() )
+            if( (str = get_next_token()).empty())
             {
                 sleep_duration = std::chrono::duration<int, std::milli>::zero();
             } else
