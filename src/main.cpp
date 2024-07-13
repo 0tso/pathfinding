@@ -15,16 +15,20 @@
 
 State global_state;
 bool pathfinding = false;
+bool cleared = false;
 
 void remove_temp(State& state)
 {
     for(int i = 0; i < state.height * state.width; ++i)
     {
-        if(state.map[i] == Node::VISITED || state.map[i] == Node::SAVED)
+        if(state.map[i] == Node::VISITED
+        || state.map[i] == Node::SAVED
+        || state.map[i] == Node::PATH)
         {
             state.map[i] = Node::UNVISITED;
         }
     }
+    cleared = true;
 }
 
 sf::Vector2i get_mouse_world_coords(const sf::RenderWindow& window)
@@ -52,13 +56,19 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
     view.zoom(0.01);
     window->setView(view);
 
-    auto set_node = [&](int x, int y, Node type)
+    auto set_node = [&](int x, int y, Node type) -> bool
     {
         if(!pathfinding && check_coords(*state, x, y))
         {
             int index = y * global_state.width + x;
             global_state.map[index] = type;
             state->map[index] = type;
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     };
 
@@ -128,12 +138,17 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
                 auto [x, y] = get_mouse_world_coords(*window);
-                set_node(x, y, Node::WALL);
+                if(set_node(x, y, Node::WALL))
+                    if(!cleared)
+                        remove_temp(*state);
             }
+
             if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
             {
                 auto [x, y] = get_mouse_world_coords(*window);
-                set_node(x, y, Node::UNVISITED);
+                if(set_node(x, y, Node::UNVISITED))
+                    if(!cleared)
+                        remove_temp(*state);
             }
         }
 
@@ -175,7 +190,8 @@ void pathfinding_loop(Algorithm* algo,
         std::cout << "no path found." << std::endl;
     } else
     {
-        std::cout << "found path with length " << result.length;
+        std::cout << "found path with length " << result.length
+        << " expanded " << result.expanded;
         if(sleep_time == std::chrono::duration<int, std::milli>::zero())
         {
             std::cout << " and elapsed time " << elapsed << " microseconds.";
@@ -298,6 +314,7 @@ int main(int argc, char** argv)
             pathfinding = true;
             std::thread t{pathfinding_loop, algo, &global_state, &render_state, &render_update_mutex, sleep_duration};
             t.join();
+            cleared = false;
             pathfinding = false;
         }
     }

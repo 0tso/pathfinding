@@ -16,7 +16,7 @@ Toteutan työssä A* ja jump point search (JPS) -algoritmit. Vertailen algoritmi
 
 Algoritmit ratkaisevat reitinhakuongelman: kuinka löytää lyhyin ja tehokkain reitti kohteesta A kohteeseen B verkossa. Jump point search -algoritmi käyttää hyväkseen erityisesti tasaisten, ruudukkomaisten verkkojen erityisominaisuuksia, eli se soveltuu esimerkiksi peleihin. Oma motivaatio reitinhakualgoritmien implementoimiseen tuleekin juuri pelien vaatimuksista.
 
-Pelifokuksen ja JPS-algoritmin käytön takia verkon kaikkien reunojen hinta / paino on sama. 
+Pelifokuksen ja JPS-algoritmin käytön takia verkon kaikkien reunojen hinta / paino on sama. Algoritmeista tarjotaan niin neljään suuntaan kuin kahdeksaan suuntaan etenevät versiot.
 
 Pääohjelma on visuaalinen: se näyttää käyttäjälle kartan, johon käyttäjä voi piirtää esteitä sekä asettaa lähtö- ja loppupisteet. Käyttäjä voi myös lopulta konsoliin tietyt komennot syöttämällä suorittaa halutun reitinhakualgoritmin. Suorittaessa & suorituksen jälkeen ohjelma näyttää visuaalisesti kiinnostavia reitinhaun ominaisuuksia (esimerkiksi löydetty polku, tutkitut solmut, jne.) Kartta voidaan myös ladata ja tulkita suoraan kuvatiedostosta, joka ohjelmalle voidaan antaa komentoriviparametrina.
 

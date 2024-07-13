@@ -22,6 +22,7 @@ public:
         Type type = Type::FAILURE;
         std::vector<sf::Vector2i> path;
         float length = 0;
+        int expanded = 0;
     };
 
     /**
