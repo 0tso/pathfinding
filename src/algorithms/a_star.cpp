@@ -3,26 +3,8 @@
 #include <utility>
 
 #include "algorithms/a_star.hpp"
+#include "algorithms/util.hpp"
 #include "state.hpp"
-
-/**
- * Flattens the input coordinates (x, y) to single-dimensional array coordinates.
- */
-int flatten(int width, int x, int y)
-{
-    return y * width + x;
-}
-
-/**
- * Expands the input node index into a pair of coordinates (x, y).
- * The inverse function of the above flatten()
- */
-std::pair<int, int> expand(int width, int idx)
-{
-    return {idx % width, idx / width};
-}
-
-
 
 void AStar::init(State* s)
 {
@@ -39,7 +21,7 @@ void AStar::init(State* s)
     }
     
     // Set the correct information of the starting node and add it to the open queue.
-    auto start_index = flatten(s->width, s->begin.x, s->begin.y);
+    auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     nodes[start_index].distance = 0.0f;
     open.emplace(0.0f, start_index);
 }
@@ -48,68 +30,6 @@ float AStar::heuristic(int x, int y)
 {
     // Manhattan distance
     return std::abs(state->end.x - x) + std::abs(state->end.y - y);
-}
-
-int AStar::get_neighbours(int x, int y)
-{
-    /**
-     * The constant buffer containing neigbour directions.
-     * The first two values are the direction of the neigbour.
-     * The second two values are the adjacent perpendiculars. They are only set for diagonals.
-     * These adjacent perpendiculars need to be checked so that the algorithm doesn't go through walls diagonally.
-     */
-    static const int changes[][4] =
-    {
-        // Perpendiculars
-        {0, 1, 0, 0},
-        {1, 0, 0, 0},
-        {0, -1, 0, 0},
-        {-1, 0, 0, 0},
-        
-        // Diagonals
-        {-1, 1, 0, 3},
-        {1, 1, 0, 1},
-        {1, -1, 1, 2},
-        {-1, -1, 2, 3}
-    };
-
-    auto is_wall = [&](int x, int y) -> std::pair<bool, node_index>
-    {
-        node_index idx = flatten(state->width, x, y);
-        return {state->map[idx] == Node::WALL, idx};
-    };
-
-    int amount_neighbours = 0;
-    for(int i = 0; i < 8; ++i)
-    {
-        int new_x = x + changes[i][0];
-        int new_y = y + changes[i][1];
-
-        if(new_x >= 0 && new_x < state->width
-        && new_y >= 0 && new_y < state->height)
-        {
-            auto [wall, new_index] = is_wall(new_x, new_y);
-            if(!wall)
-            {
-                // Make sure it doesn't go through walls diagonally.
-                if(i > 3)
-                {
-                    auto perp1 = changes[i][2];
-                    auto perp2 = changes[i][3];
-                    auto [wall1, _1] = is_wall(x + changes[perp1][0], y + changes[perp1][1]);
-                    auto [wall2, _2] = is_wall(x + changes[perp2][0], y + changes[perp2][1]);
-                    if(wall1 || wall2)
-                    {
-                        continue;
-                    }
-                }
-
-                neighbours[amount_neighbours] = {new_index, i > 3};
-                amount_neighbours++;
-            }
-        }
-    }
-    return amount_neighbours;
 }
 
 Algorithm::Result::Type AStar::update()
@@ -123,7 +43,7 @@ Algorithm::Result::Type AStar::update()
     auto [approx_dist, node_idx] = open.top();
     open.pop();
 
-    auto [x, y] = expand(state->width, node_idx);
+    auto [x, y] = Util::expand(state->width, node_idx);
     auto& node = nodes[node_idx];
 
     if(node.status == InternalNode::Status::EXAMINED)
@@ -141,12 +61,12 @@ Algorithm::Result::Type AStar::update()
         state->map[node_idx] = Node::VISITED;
     }
 
-    auto amount_neighbours = get_neighbours(x, y);
+    auto amount_neighbours = Util::get_neighbours(this->neighbours, *state, x, y);
     for(int i = 0; i < amount_neighbours; ++i)
     {
         auto [neighbour_idx, is_diagonal] = neighbours[i];
         auto& neighbour = nodes[neighbour_idx];
-        auto [neighbour_x, neighbour_y] = expand(state->width, neighbour_idx);
+        auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
         
         // All perpendicular neighbours are one unit of distance away
         // and all the diagonal neigbours are sqrt(2) units of distance away.
@@ -169,7 +89,7 @@ Algorithm::Result::Type AStar::update()
                     {
                         break;
                     }
-                    auto [x, y] = expand(state->width, prev_idx);
+                    auto [x, y] = Util::expand(state->width, prev_idx);
                     result.path.emplace_back(x, y);
                     state->map[prev_idx] = Node::PATH;
                     prev_idx = prev_node.prev;

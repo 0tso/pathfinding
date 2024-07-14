@@ -8,6 +8,7 @@
 
 #include "state.hpp"
 #include "algorithms/algorithm.hpp"
+#include "algorithms/util.hpp"
 
 class AStar : public Algorithm
 {
@@ -19,11 +20,6 @@ public:
 
 private:
 
-    /**
-     * The nodes will be referred to using node_indices.
-     * The node_indices refer to the nodes vector.
-     */
-    typedef size_t node_index;
 
     /**
      * The node implementation used internally.
@@ -54,21 +50,10 @@ private:
      */
     float heuristic(int x, int y);
 
-    /**
-     * Finds all the possible neighbours of the node in the specified location.
-     * Stores all the found neighbours in the "neighbours" buffer.
-     * 
-     * @param x The x-position of the node.
-     * @param y The y-position of the node.
-     * 
-     * @returns The number of neighbours found and added to the buffer.
-     */
-    int get_neighbours(int x, int y);
 
     /**
-     * The buffer that the aforementioned function uses to store its values.
-     * The first value of the pair is the neighbour
-     * The second value of the pair is whether or not it's a diagonal neighbour
+     * The buffer in which to store neighbouring nodes.
+     * A pair of noded index and a bool specifying whether or not the node is a diagonal neighbour.
      */
     std::pair<node_index, bool> neighbours[8];
 
