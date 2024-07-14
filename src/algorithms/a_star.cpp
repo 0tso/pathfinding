@@ -26,12 +26,6 @@ void AStar::init(State* s)
     open.emplace(0.0f, start_index);
 }
 
-float AStar::heuristic(int x, int y)
-{
-    // Manhattan distance
-    return std::abs(state->end.x - x) + std::abs(state->end.y - y);
-}
-
 Algorithm::Result::Type AStar::update()
 {
     if(open.empty())
@@ -107,11 +101,13 @@ Algorithm::Result::Type AStar::update()
 
             // We have found a new, more optimized way to reach this node.
             // Therefore we should expand this node again later.
+            // The used heuristic is manhattan distance |x1 - x2| + |y1 - y2|.
 
             neighbour.distance = new_dist;
             neighbour.status = InternalNode::Status::UNEXAMINED;
             neighbour.prev = node_idx;
-            float approx_total_path_length = new_dist + heuristic(neighbour_x, neighbour_y);
+            float approx_total_path_length =
+                new_dist + Util::manhattan_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.emplace(approx_total_path_length, neighbour_idx);
         }
     }

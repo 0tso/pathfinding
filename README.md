@@ -21,7 +21,13 @@ sudo apt install libsfml-dev
 This is the recommended way on Linux distributions because vcpkg will require you to fix the [system dependencies](https://learn.microsoft.com/en-us/vcpkg/troubleshoot/build-failures#missing-system-dependencies) yourself anyway.
 
 ## Building & executing
-To build the project, execute the following commands in the project root directory:
+First, download the repository, for example by using the following Git command
+```
+git clone https://github.com/0tso/pathfinding.git
+```
+or by left-clicking the green "Code" button on Github and downloading the ZIP file.
+
+Then, to build the project, execute the following commands in the project root directory:
 ```
 cmake --preset=release
 cmake --build build --config Release

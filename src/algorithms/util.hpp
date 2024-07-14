@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <utility>
+#include <cmath>
 
 #include "state.hpp"
 
@@ -45,7 +46,15 @@ namespace Util
         return {idx % width, idx / width};
     }
 
-
+    /**
+     * Returns the manhattan distance between two points: (x1, y1) and (x2, y2).
+     * Manhattan distance: |x1 - x2| + |y1 - y2| 
+     * Used for heuristics in the pathfinding algorithms.
+     */
+    inline float manhattan_distance(int x1, int y1, int x2, int y2)
+    {
+        return std::abs(x1 - x2) + std::abs(y1 - y2);
+    }
 }
 
 #endif

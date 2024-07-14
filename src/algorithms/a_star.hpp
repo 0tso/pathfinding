@@ -43,20 +43,10 @@ private:
     };
 
     /**
-     * Heuristic function.
-     * 
-     * @param x The x-position of the node.
-     * @param y The y-position of the node.
-     */
-    float heuristic(int x, int y);
-
-
-    /**
      * The buffer in which to store neighbouring nodes.
      * A pair of noded index and a bool specifying whether or not the node is a diagonal neighbour.
      */
     std::pair<node_index, bool> neighbours[8];
-
 
     /**
      * The main storage for Nodes. All nodes will saved here and referenced using pointers.
