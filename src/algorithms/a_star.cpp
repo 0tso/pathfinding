@@ -64,7 +64,7 @@ Algorithm::Result::Type AStar::update()
         
         // All perpendicular neighbours are one unit of distance away
         // and all the diagonal neigbours are sqrt(2) units of distance away.
-        float new_dist = node.distance + (is_diagonal ? 1.414213f : 1.0f);
+        float new_dist = node.distance + (is_diagonal ? 1.414214f : 1.0f);
         if(new_dist < neighbour.distance)
         {
             // Check if the neigbour is the end
@@ -107,7 +107,7 @@ Algorithm::Result::Type AStar::update()
             neighbour.status = InternalNode::Status::UNEXAMINED;
             neighbour.prev = node_idx;
             float approx_total_path_length =
-                new_dist + Util::manhattan_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
+                new_dist + Util::euclidian_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.emplace(approx_total_path_length, neighbour_idx);
         }
     }

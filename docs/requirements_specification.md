@@ -40,6 +40,7 @@ http://users.cecs.anu.edu.au/~dharabor/data/papers/harabor-grastien-aaai11.pdf
 ### Muita reitinhakuun liittyviä algoritmeja ja ideoita tutkittavaksi, jos aikaa jää
 
 * A* jaetun prioriteettijonon kanssa (jono jaetaan jatkuvasti järjestyksessä pidettäviin ja muihin)
+* JPS+ (also with Goal Bounding?)
 * Fringe search
 * Flow fields
 * Rectangular symmetry reduction
