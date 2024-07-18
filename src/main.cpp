@@ -202,6 +202,71 @@ void pathfinding_loop(Algorithm* algo,
 
 Algorithm* a_star = new AStar();
 
+void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* render_update_mutex)
+{
+    while(window->isOpen())
+    {
+        std::cout << "> ";
+
+        std::string i;
+        std::getline(std::cin, i);
+
+        auto get_next_token = [&]() -> std::string
+        {
+            auto pos = i.find(' ');
+            if(pos == std::string::npos)
+            {
+                auto temp = i;
+                i.clear();
+                return temp;
+            }
+            else
+            {
+                auto token = i.substr(0, pos);
+                i.erase(0, pos + 1);
+                return token;
+            }
+        };
+
+        auto first = get_next_token();
+        if(first == "exit")
+        {
+            window->close();
+        }
+        if(first == "start")
+        {
+            remove_temp(global_state);
+            render_update_mutex->lock();
+            remove_temp(*render_state);
+            render_update_mutex->unlock();
+
+            auto algo_name = get_next_token();
+            Algorithm* algo;
+            if(algo_name == "A*")
+                algo = a_star;
+            else
+            {
+                std::cout << "unknown algorithm." << std::endl;
+                continue;
+            }
+
+            std::chrono::duration<int, std::milli> sleep_duration;
+            std::string str;
+            if( (str = get_next_token()).empty())
+            {
+                sleep_duration = std::chrono::duration<int, std::milli>::zero();
+            } else
+            {
+                sleep_duration = std::chrono::milliseconds(std::stoi(str));
+            }
+            pathfinding = true;
+            pathfinding_loop(algo, &global_state, render_state, render_update_mutex, sleep_duration);
+            cleared = false;
+            pathfinding = false;
+        }
+    }
+}
+
 int main(int argc, char** argv)
 {
     sf::RenderWindow window{sf::VideoMode{2000, 1500}, "Pathfinding visualization"};
@@ -253,71 +318,8 @@ int main(int argc, char** argv)
 
     State render_state{global_state};
     std::mutex render_update_mutex;
-    std::thread render{render_loop, &window, &render_state, &render_update_mutex};
-
-    while(window.isOpen())
-    {
-        std::cout << "> ";
-
-        std::string i;
-        std::getline(std::cin, i);
-
-        auto get_next_token = [&]() -> std::string
-        {
-            auto pos = i.find(' ');
-            if(pos == std::string::npos)
-            {
-                auto temp = i;
-                i.clear();
-                return temp;
-            }
-            else
-            {
-                auto token = i.substr(0, pos);
-                i.erase(0, pos + 1);
-                return token;
-            }
-        };
-
-        auto first = get_next_token();
-        if(first == "exit")
-        {
-            window.close();
-            render.join();
-        }
-        if(first == "start")
-        {
-            remove_temp(global_state);
-            render_update_mutex.lock();
-            remove_temp(render_state);
-            render_update_mutex.unlock();
-
-            auto algo_name = get_next_token();
-            Algorithm* algo;
-            if(algo_name == "A*")
-                algo = a_star;
-            else
-            {
-                std::cout << "unknown algorithm." << std::endl;
-                continue;
-            }
-
-            std::chrono::duration<int, std::milli> sleep_duration;
-            std::string str;
-            if( (str = get_next_token()).empty())
-            {
-                sleep_duration = std::chrono::duration<int, std::milli>::zero();
-            } else
-            {
-                sleep_duration = std::chrono::milliseconds(std::stoi(str));
-            }
-            pathfinding = true;
-            std::thread t{pathfinding_loop, algo, &global_state, &render_state, &render_update_mutex, sleep_duration};
-            t.join();
-            cleared = false;
-            pathfinding = false;
-        }
-    }
+    std::thread render{console_loop, &window, &render_state, &render_update_mutex};
+    render_loop(&window, &render_state, &render_update_mutex);
 
     return 0;
 }
