@@ -63,3 +63,20 @@ int Util::get_neighbours(std::pair<node_index, bool>* buffer, const State& state
     }
     return amount_neighbours;
 }
+
+std::pair<int, int> Util::get_movement(Direction dir)
+{
+    static const std::pair<int, int> movement[] =
+    {
+        {0, -1},
+        {1, -1},
+        {1, 0},
+        {1, 1},
+        {0, 1},
+        {-1, 1},
+        {-1, 0},
+        {-1, -1}
+    };
+
+    return movement[dir];
+}

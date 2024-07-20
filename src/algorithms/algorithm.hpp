@@ -41,10 +41,13 @@ public:
      * Gets the Result object of the algorithm.
      * Only call after the algorithm has completed. Otherwise undefined behaviour.
      */
-    virtual Result get_result() = 0;
+    virtual Result get_result() { return result; }
 
 protected:
     State* state;
+    
+    // Stores result information for the get_result()
+    Result result;
 };
 
 #endif

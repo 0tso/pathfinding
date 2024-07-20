@@ -1,18 +1,16 @@
 #ifndef JPS_HPP
 #define JPS_HPP
 
-#include "algorithms/algorithm.hpp"
+#include <queue>
 
-class JumpPointSearch : public Algorithm
+#include "algorithms/common.hpp"
+
+class JumpPointSearch : public CommonAlgorithm
 {
 public:
-
-    void init(State* state);
     Algorithm::Result::Type update();
-    Algorithm::Result get_result();
 
 private:
-
 };
 
 #endif
