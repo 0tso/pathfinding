@@ -32,16 +32,18 @@ Algorithm::Result::Type AStar::update()
         state->map[node_idx] = Node::VISITED;
     }
 
-    auto amount_neighbours = Util::get_neighbours(this->neighbours, *state, x, y);
+    std::pair<node_index, dir_t> neighbours[8];
+    auto amount_neighbours = Util::get_neighbours(neighbours, *state, x, y);
+
     for(int i = 0; i < amount_neighbours; ++i)
     {
-        auto [neighbour_idx, is_diagonal] = neighbours[i];
+        auto [neighbour_idx, dir] = neighbours[i];
         auto& neighbour = nodes[neighbour_idx];
         auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
         
         // All perpendicular neighbours are one unit of distance away
         // and all the diagonal neigbours are sqrt(2) units of distance away.
-        float new_dist = node.distance + (is_diagonal ? SQRT_2 : 1.0f);
+        float new_dist = node.distance + (dir->straight ? 1.0f : SQRT_2);
         if(new_dist < neighbour.distance)
         {
             // We have found a new, more optimized way to reach this node.

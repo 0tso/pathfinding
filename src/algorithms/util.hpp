@@ -18,24 +18,51 @@ typedef size_t node_index;
 
 
 /**
- * Square root of two.
+ * Square root of two rounded upwards.
  * Used for diagonal movement costs.
  */
 constexpr float SQRT_2 = 1.4142136;
 
 
-enum Direction : uint8_t
+struct Direction
 {
-    NORTH = 0,
-    NORTHEAST,
-    EAST,
-    SOUTHEAST,
-    SOUTH,
-    SOUTHWEST,
-    WEST,
-    NORTHWEST
+    enum : uint8_t
+    {
+        NORTH = 0,
+        NORTHEAST,
+        EAST,
+        SOUTHEAST,
+        SOUTH,
+        SOUTHWEST,
+        WEST,
+        NORTHWEST
+    } type;
+
+    bool straight;
+
+    // Relative change in position
+    std::pair<int, int> movement;
+
+    // If a diagonal direction, the component directions
+    // For example NORTHEAST -> NORTH, EAST
+    std::pair<const Direction*, const Direction*> components;
 };
 
+typedef const Direction* dir_t;
+
+/**
+ * All of the directions in an array.
+ */
+extern dir_t const directions[];
+
+extern dir_t const DIR_NORTH;
+extern dir_t const DIR_NORTHEAST;
+extern dir_t const DIR_EAST;
+extern dir_t const DIR_SOUTHEAST;
+extern dir_t const DIR_SOUTH;
+extern dir_t const DIR_SOUTHWEST;
+extern dir_t const DIR_WEST;
+extern dir_t const DIR_NORTHWEST;
 
 
 namespace Util
@@ -44,15 +71,22 @@ namespace Util
      * Finds all the possible neighbours of the node in the specified location.
      * 
      * @param buffer The buffer in which to store the neighbours.
-     *      The first pair element is the node index, the second is a boolean representing whether or not the neighbour is diagonal.
+     *      The first pair element is the node index, the second is the direction of the neighbour.
      * @param state The state from which to read.
      * @param x The x-position of the node.
      * @param y The y-position of the node.
      * 
      * @returns The number of neighbours found and added to the buffer.
      */
-    int get_neighbours(std::pair<node_index, bool>* buffer, const State& state, int x, int y);
+    int get_neighbours(std::pair<node_index, dir_t>* buffer, const State& state, int x, int y);
 
+    /**
+     * Returns the direction from (x1, y1) to (x2, y2).
+     * Only designed for neighbours, but also somewhat works for farther-away nodes.
+     * 
+     * Northeast is assumed to be (1, -1).
+     */
+    dir_t get_direction(int x1, int y1, int x2, int y2);
 
     /**
      * Flattens the input coordinates (x, y) to single-dimensional array coordinates.
@@ -72,15 +106,12 @@ namespace Util
     }
 
     /**
-     * Gets the (x, y) coordinates matching the specified direction.
-     * (0, 0) is assumed to be in the northwestern corner, so north and west are both -1.
-     * 
-     * @param dir The direction whose movement to query.
-     * 
-     * @returns An std::pair<int, int> with (x, y) changes.
+     * Is the specified node a wall?
      */
-    std::pair<int, int> get_movement(Direction dir);
-
+    inline bool is_wall(const State& state, node_index idx)
+    {
+        return state.map[idx] == Node::WALL;
+    }
 
     /**
      * Returns the manhattan distance between two points: (x1, y1) and (x2, y2).
@@ -103,8 +134,8 @@ namespace Util
     /**
      *  Builds the path from the nodes when the end has been reached.
      *  The nodes must be of type T.
-     *  Each node object of type T is expected to have a pointer to node_index called "prev".
-     *  This "prev" member variable points to the previous point in the path.
+     *  Each node object of type T is expected to have a node_index member variable called "prev".
+     *  This "prev" variable points to the previous point in the path.
      *  The path generation is started from the end node in the state.
      */
     template<typename T>
