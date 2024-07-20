@@ -8,7 +8,7 @@ Resursseina toimivat alkuperäinen [Online Graph Pruning for Pathfinding on Grid
 
 Ohjelman tasolla paransin useiden funktioiden ja ominaisuuksien uudelleenkäytettävyyttä erittelemällä ne A*:n toteutuksesta yleiseen Util-nimiavaruuteen. Toteutin myös JPS-algoritmin A*:n kanssa koska tajusin, että JPS ei ole itsessään reitinhakualgoritmi vaan enneminkin tutkittavan alueen ja symmetrian karsimisalgoritmi.
 
-Olettaen, että A*- ja JPS-algoritmit toimivat oikein (mitä ainakaan alustavasti ne eivät näytä tekevän, koska testikartassa niiden palauttamien etäisyyksien välillä on noin 0,5 mittayksikön verran heittoa, mikä on varsin hämmentävää, koska reitit _näyttävät_ pintapuolisesti optimaalisilta ja hyvin hyvin samanlaisilta. Yksinkertaisemmissa kartoissa eroa ei ole.), sovelluksen logiikka on siis valmis. Ainoastaan testit puuttuvat, joita alankin seuraavalla viikolla heti työstämään.
+Olettaen, että A*- ja JPS-algoritmit toimivat oikein (mikä näyttää silmämääräisesti arvioiden pitävän paikkaansa; ne myös palauttavat samoista kartoista samat optimaalisilta näyttävät etäisyydet), sovelluksen logiikka on siis valmis. Ainoastaan testit puuttuvat, joita alankin seuraavalla viikolla heti työstämään.
 
 JPS-algoritmiin liittyen minulla on kuitenkin vielä muutamia kysymyksiä: haittaako, vaikka otin muutamia luovia vapauksia ja mm. skippasin kokonaan JPS:n `jump`-funktiossa diagonaalisesti etenevien noodien lisäämisen erikseen laajennettaviksi jump pointeiksi? (niitä ei siis koskaan lisätä avoimeen prioriteettijonoon, ainoastaan kohtisuoraan etenevät solmut lisätään, jos niillä on "pakotettuja naapureita")
 Ainakin nopeasti päätellen tämän ei pitäisi muuttaa reitinhaun optimaalisuutta. 

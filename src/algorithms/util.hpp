@@ -81,6 +81,18 @@ namespace Util
     int get_neighbours(std::pair<node_index, dir_t>* buffer, const State& state, int x, int y);
 
     /**
+     * Checks if the move from (x, y) is valid.
+     * Especially important for checking diagonals.
+     * 
+     * @param state The world state.
+     * @param x, y The coordinates of the node from which to move
+     * @param dir The direction in which to move.
+     * 
+     * @returns Whether the move is possible.
+     */
+    bool is_move_valid(const State& state, int x, int y, dir_t dir);
+
+    /**
      * Returns the direction from (x1, y1) to (x2, y2).
      * Only designed for neighbours, but also somewhat works for farther-away nodes.
      * 

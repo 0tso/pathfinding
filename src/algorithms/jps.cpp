@@ -86,11 +86,6 @@ void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
     auto node_idx = Util::flatten(state->width, x, y);
     auto& node = nodes[node_idx];
 
-    if(!Util::is_empty(*state, x, y))
-    {
-        return;
-    }
-
     distance += dir->straight ? 1.0f : SQRT_2;
     if(distance >= node.distance)
     {
@@ -138,10 +133,12 @@ void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
     {
         for(dir_t component : {dir->components.first, dir->components.second})
         {
-            jump(node_idx, component, distance);
+            if(Util::is_move_valid(*state, x, y, component))
+                jump(node_idx, component, distance);
         }
     }
 
     // Keep jumping in this direction
-    jump(node_idx, dir, distance);
+    if(Util::is_move_valid(*state, x, y, dir))
+        jump(node_idx, dir, distance);
 }
