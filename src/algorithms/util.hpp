@@ -15,7 +15,7 @@
  * Represents an index into a flat array of nodes.
  */
 typedef size_t node_index;
-
+constexpr node_index NULL_NODE_IDX = std::numeric_limits<node_index>::infinity();
 
 /**
  * Square root of two rounded upwards.
@@ -106,11 +106,32 @@ namespace Util
     }
 
     /**
+     * Is the specified node within map bounds?
+     */
+    inline bool is_valid(const State& state, int x, int y)
+    {
+        return x >= 0
+            && x < state.width
+            && y >= 0
+            && y < state.height;
+    }
+
+    /**
      * Is the specified node a wall?
      */
-    inline bool is_wall(const State& state, node_index idx)
+    inline bool is_wall(const State& state, int x, int y)
     {
-        return state.map[idx] == Node::WALL;
+        auto idx = flatten(state.width, x, y);
+        return is_valid(state, x, y) && state.map[idx] == Node::WALL;
+    }
+
+    /**
+     * Is the specified node an empty point, i.e. valid and not a wall?
+     */
+    inline bool is_empty(const State& state, int x, int y)
+    {
+        auto idx = flatten(state.width, x, y);
+        return is_valid(state, x, y) && state.map[idx] != Node::WALL;
     }
 
     /**
@@ -146,13 +167,14 @@ namespace Util
         while(true)
         {
                 T& prev_node = nodes[prev_idx];
-                if(prev_node.prev == std::numeric_limits<node_index>::infinity())
+                if(prev_node.prev == NULL_NODE_IDX)
                 {
                     break;
                 }
                 auto [x, y] = expand(state.width, prev_idx);
                 res.path.emplace_back(x, y);
-                state.map[prev_idx] = Node::PATH;
+                if(!(x == state.end.x && y == state.end.y))
+                    state.map[prev_idx] = Node::PATH;
                 prev_idx = prev_node.prev;
         }
         std::reverse(res.path.begin(), res.path.end());

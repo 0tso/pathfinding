@@ -12,6 +12,7 @@
 #include "renderer.hpp"
 #include "algorithms/algorithm.hpp"
 #include "algorithms/a_star.hpp"
+#include "algorithms/jps.hpp"
 
 State global_state;
 bool pathfinding = false;
@@ -21,8 +22,8 @@ void remove_temp(State& state)
 {
     for(int i = 0; i < state.height * state.width; ++i)
     {
-        if(state.map[i] == Node::VISITED
-        || state.map[i] == Node::SAVED
+        if(state.map[i] == Node::EXPANDED
+        || state.map[i] == Node::EXAMINED
         || state.map[i] == Node::PATH)
         {
             state.map[i] = Node::UNVISITED;
@@ -201,6 +202,7 @@ void pathfinding_loop(Algorithm* algo,
 }
 
 Algorithm* a_star = new AStar();
+Algorithm* jps = new JumpPointSearch();
 
 void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* render_update_mutex)
 {
@@ -244,6 +246,8 @@ void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* ren
             Algorithm* algo;
             if(algo_name == "A*")
                 algo = a_star;
+            else if(algo_name == "JPS")
+                algo = jps;
             else
             {
                 std::cout << "unknown algorithm." << std::endl;

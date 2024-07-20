@@ -1,3 +1,6 @@
+#ifndef COMMON_HPP
+#define COMMON_HPP
+
 #include <limits>
 #include <queue>
 
@@ -21,7 +24,7 @@ struct InternalNode
     };
 
     float distance      = std::numeric_limits<float>::infinity(); 
-    node_index prev     = std::numeric_limits<node_index>::infinity();
+    node_index prev     = NULL_NODE_IDX;
     Status status       = Status::UNEXAMINED;
 };
 
@@ -43,3 +46,5 @@ protected:
     typedef std::pair<float, node_index> queue_pair;
     std::priority_queue<queue_pair, std::vector<queue_pair>, std::greater<queue_pair>> open;
 };
+
+#endif

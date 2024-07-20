@@ -64,7 +64,7 @@ int Util::get_neighbours(std::pair<node_index, dir_t>* buffer, const State& stat
     auto wall_check = [&](int x, int y) -> std::pair<bool, node_index>
     {
         node_index idx = flatten(state.width, x, y);
-        return {is_wall(state, idx), idx};
+        return {is_empty(state, x, y), idx};
     };
 
     int amount_neighbours = 0;
@@ -74,32 +74,28 @@ int Util::get_neighbours(std::pair<node_index, dir_t>* buffer, const State& stat
         int new_x = x + dir->movement.first;
         int new_y = y + dir->movement.second;
 
-        if(new_x >= 0 && new_x < state.width
-        && new_y >= 0 && new_y < state.height)
+        auto [valid, new_index] = wall_check(new_x, new_y);
+        if(valid)
         {
-            auto [wall, new_index] = wall_check(new_x, new_y);
-            if(!wall)
+            // Make sure it doesn't go through walls diagonally.
+            if(i > 3)
             {
-                // Make sure it doesn't go through walls diagonally.
-                if(i > 3)
+                int perp1 = std::get<1>(changes[i]);
+                int perp2 = std::get<2>(changes[i]);
+
+                auto dir_1 = std::get<dir_t>(changes[perp1]);
+                auto dir_2 = std::get<dir_t>(changes[perp2]);
+
+                auto [valid1, _1] = wall_check(x + dir_1->movement.first, y + dir_1->movement.second);
+                auto [valid2, _2] = wall_check(x + dir_2->movement.first, y + dir_2->movement.second);
+                if(!valid1 || !valid2)
                 {
-                    int perp1 = std::get<1>(changes[i]);
-                    int perp2 = std::get<2>(changes[i]);
-
-                    auto dir_1 = std::get<dir_t>(changes[perp1]);
-                    auto dir_2 = std::get<dir_t>(changes[perp2]);
-
-                    auto [wall1, _1] = wall_check(x + dir_1->movement.first, y + dir_1->movement.second);
-                    auto [wall2, _2] = wall_check(x + dir_2->movement.first, y + dir_2->movement.second);
-                    if(wall1 || wall2)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
-
-                buffer[amount_neighbours] = {new_index, dir};
-                amount_neighbours++;
             }
+
+            buffer[amount_neighbours] = {new_index, dir};
+            amount_neighbours++;
         }
     }
     return amount_neighbours;
@@ -118,8 +114,7 @@ const Direction* Util::get_direction(int x1, int y1, int x2, int y2)
     {
         return y_d > 0 ? directions[Direction::SOUTH] : directions[Direction::NORTH];
     }
-    if(x_d < 0)
-    {
-        return directions[Direction::WEST - y_d];
-    }
+
+    // d_x < 0
+    return directions[Direction::WEST - y_d];
 }

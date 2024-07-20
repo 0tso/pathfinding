@@ -11,8 +11,8 @@ enum Node : uint8_t
     WALL        = 1,
     START       = 2,
     END         = 3,
-    VISITED     = 4,
-    SAVED       = 5,
+    EXPANDED    = 4,
+    EXAMINED    = 5,
     PATH        = 6
 };
 

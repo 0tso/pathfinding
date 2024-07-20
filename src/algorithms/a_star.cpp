@@ -26,10 +26,10 @@ Algorithm::Result::Type AStar::update()
     node.status = InternalNode::Status::EXAMINED;
     result.expanded++;
 
-    // Is the current node the first node? If not, set it to VISITED
+    // Is the current node the first node? If not, set it to EXPANDED
     if(node.prev != std::numeric_limits<node_index>::infinity())
     {
-        state->map[node_idx] = Node::VISITED;
+        state->map[node_idx] = Node::EXPANDED;
     }
 
     std::pair<node_index, dir_t> neighbours[8];
@@ -65,7 +65,7 @@ Algorithm::Result::Type AStar::update()
             }
             else
             {
-                state->map[neighbour_idx] = Node::SAVED;
+                state->map[neighbour_idx] = Node::EXAMINED;
             }
 
             neighbour.status = InternalNode::Status::UNEXAMINED;
