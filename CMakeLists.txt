@@ -14,7 +14,8 @@ target_include_directories(pathfinding_visualizer PRIVATE "${PROJECT_SOURCE_DIR}
 # tests
 file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS "src/algorithms/*.cpp" "src/state.hpp" "tests/*.cpp")
 add_executable(tests EXCLUDE_FROM_ALL "${TEST_SRC}")
-target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}/src")
+target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+target_compile_options(tests PRIVATE "-Wno-unused-result")
 
 # separate variable because fetching Catch2 takes some time
 if(BUILD_TESTS)
@@ -25,6 +26,5 @@ if(BUILD_TESTS)
     GIT_TAG        v3.4.0
   )
   FetchContent_MakeAvailable(Catch2)
-  target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+  target_link_libraries(tests PRIVATE Catch2::Catch2)
 endif()
-unset(BUILD_TESTS CACHE)
