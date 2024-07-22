@@ -42,7 +42,7 @@ Algorithm::Result::Type JumpPointSearch::update()
 
     if(x == state->end.x && y == state->end.y)
     {
-        Util::build_path<InternalNode>(*state, nodes, result);
+        Util::build_path<InternalNode>(*state, &nodes[0], result);
         result.length = node.distance;
         result.type = Result::Type::SUCCESS;
         return Result::Type::SUCCESS;

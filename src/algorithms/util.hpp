@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <utility>
 #include <cmath>
-#include <span>
 #include <algorithm>
 
 #include "state.hpp"
@@ -172,7 +171,7 @@ namespace Util
      *  The path generation is started from the end node in the state.
      */
     template<typename T>
-    void build_path(State& state, std::span<T> nodes, Algorithm::Result& res)
+    void build_path(State& state, T* nodes, Algorithm::Result& res)
     {
         auto end_idx = flatten(state.width, state.end.x, state.end.y);
         node_index prev_idx = end_idx;

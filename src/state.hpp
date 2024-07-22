@@ -8,6 +8,9 @@ struct Point
 {
     int x;
     int y;
+
+    bool operator==(const Point& p) const = default;
+    bool operator!=(const Point& p) const = default;
 };
 
 enum Node : uint8_t

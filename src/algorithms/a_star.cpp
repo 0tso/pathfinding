@@ -57,7 +57,7 @@ Algorithm::Result::Type AStar::update()
             if(neighbour_x == state->end.x && neighbour_y == state->end.y)
             {
                 // End & path found!
-                Util::build_path<InternalNode>(*state, nodes, result);
+                Util::build_path<InternalNode>(*state, &nodes[0], result);
                 result.length = neighbour.distance;
                 result.type = Result::Type::SUCCESS;
 

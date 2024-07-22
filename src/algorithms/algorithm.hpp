@@ -2,7 +2,6 @@
 #define ALGORITHM_HPP
 
 #include <vector>
-#include <SFML/System/Vector2.hpp>
 
 #include "state.hpp"
 
@@ -20,7 +19,7 @@ public:
         };
 
         Type type = Type::FAILURE;
-        std::vector<sf::Vector2i> path;
+        std::vector<Point> path;
         float length = 0;
         int expanded = 0;
     };

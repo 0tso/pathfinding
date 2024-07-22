@@ -32,16 +32,18 @@ Then, to build the project, execute the following commands in the project root d
 cmake --preset=release
 cmake --build build --config Release
 ```
-With vcpkg the corresponding commands are:
-```
-cmake --preset=vcpkg
-cmake --build build --config Release
-```
+When using vcpkg, set the `preset` variable to `vcpkg` instead of `release` in the first command.
 In case of [missing system dependencies](https://learn.microsoft.com/en-us/vcpkg/troubleshoot/build-failures#missing-system-dependencies) (for example from `alsa`), install those manually.
 
-<hr>
-
 After building, the executable `pathfinding` can be found and executed in the newly created `build` subdirectory.
+
+## Tests & benchmarks
+To build and execute the tests and benchmarks (provided in the [tests](./tests/) folder), run the following commands:
+```
+cmake --preset=tests
+cmake --build build --config Release --target tests
+./build/tests
+```
 
 ## Documentation
 Documentation provided in the [docs](./docs/) folder.
