@@ -12,7 +12,7 @@ target_link_libraries(pathfinding_visualizer sfml-graphics)
 target_include_directories(pathfinding_visualizer PRIVATE "${PROJECT_SOURCE_DIR}/src")
 
 # tests
-file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS "src/algorithms/*.cpp" "src/state.hpp" "tests/*.cpp")
+file(GLOB_RECURSE TEST_SRC CONFIGURE_DEPENDS "src/algorithms/*.cpp" "src/state.hpp" "src/all_algorithms.cpp" "tests/*.cpp")
 add_executable(tests EXCLUDE_FROM_ALL "${TEST_SRC}")
 target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 target_compile_options(tests PRIVATE "-Wno-unused-result")

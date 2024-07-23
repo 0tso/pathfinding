@@ -28,8 +28,8 @@ void load_map(const char* name, const char* full_path)
     {
         for(int x = 0; x < width; ++x)
         {
-            auto& tile = map.GetTile(x, y).tile1;
-            if(tile.type == kGrass || tile.type == kGround)
+            auto tile = map.GetTerrainType(x, y);
+            if(tile == kGrass || tile == kGround)
                 nodes.emplace_back(Node::UNVISITED);
             else
                 nodes.emplace_back(Node::WALL);
@@ -59,7 +59,6 @@ void load_scenario(const Experiment& exp, int id)
 void load_scenarios(const char* path)
 {
     ScenarioLoader scenarios{path};
-    std::cout << "--- num: " << scenarios.GetNumExperiments() << std::endl;
     for(int i = 0; i < scenarios.GetNumExperiments(); ++i)
     {
         load_scenario(scenarios.GetNthExperiment(i), i);
@@ -85,7 +84,6 @@ int main(int argc, char** argv)
     if(benchmark_str != "")
     {
         benchmark_dir = benchmark_str;
-        std::cout << "Loading benchmarks from directory: " << benchmark_dir << std::endl;
         for(auto& p : std::filesystem::recursive_directory_iterator(benchmark_dir))
         {
             if(p.path().extension() == ".scen")

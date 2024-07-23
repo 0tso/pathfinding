@@ -19,7 +19,12 @@ Example:
 build/tests --benchmarks tests/benchmarks
 ```
 Unit tests will be skipped, and all the scenario files within that directory will be executed.
-The output of benchmarks printed in standard output.
+The output of benchmarks printed in standard output, in the following format with comma delimiters:
+
+| map name (string) | scenario optimal length (float) | algo1 time (float, microseconds) | algo2 time | ... |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+| Aftershock.map | 3.82 | 123.10 | 67.51 | ...
+
 
 ### Attributions
 

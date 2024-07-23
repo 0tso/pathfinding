@@ -38,12 +38,13 @@ In case of [missing system dependencies](https://learn.microsoft.com/en-us/vcpkg
 After building, the executable `pathfinding` can be found and executed in the newly created `build` subdirectory.
 
 ## Tests & benchmarks
-To build and execute the tests and benchmarks (provided in the [tests](./tests/) folder), run the following commands:
+To build and execute the tests (provided in the [tests](./tests/) folder), run the following commands:
 ```
 cmake --preset=tests
 cmake --build build --config Release --target tests
 ./build/tests
 ```
+For benchmarking, see [testing_and_benchmarks.md](./docs/testing_and_benchmarks.md).
 
 ## Documentation
 Documentation provided in the [docs](./docs/) folder.

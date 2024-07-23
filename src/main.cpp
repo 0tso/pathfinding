@@ -13,6 +13,7 @@
 #include "algorithms/algorithm.hpp"
 #include "algorithms/a_star.hpp"
 #include "algorithms/jps.hpp"
+#include "all_algorithms.hpp"
 
 State global_state;
 bool pathfinding = false;
@@ -201,9 +202,6 @@ void pathfinding_loop(Algorithm* algo,
     }
 }
 
-Algorithm* a_star = new AStar();
-Algorithm* jps = new JumpPointSearch();
-
 void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* render_update_mutex)
 {
     while(window->isOpen())
@@ -244,10 +242,8 @@ void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* ren
 
             auto algo_name = get_next_token();
             Algorithm* algo;
-            if(algo_name == "A*")
-                algo = a_star;
-            else if(algo_name == "JPS")
-                algo = jps;
+            if(algorithms.contains(algo_name))
+                algo = algorithms[algo_name];
             else
             {
                 std::cout << "unknown algorithm." << std::endl;
