@@ -20,7 +20,7 @@ constexpr node_index NULL_NODE_IDX = std::numeric_limits<node_index>::infinity()
  * Square root of two rounded upwards.
  * Used for diagonal movement costs.
  */
-constexpr float SQRT_2 = 1.4142136;
+constexpr float SQRT_2 = 1.41421357;
 
 
 struct Direction

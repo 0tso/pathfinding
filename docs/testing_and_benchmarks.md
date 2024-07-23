@@ -8,7 +8,9 @@ Instructions for building and running tests are in the main [README.md](../READM
 ## Unit tests
 
 The following modules are unit tested extensively:
-* [Util](../src/algorithms/util.hpp)
+* [Util](../src/algorithms/util.hpp) ----> [test_util.cpp](../tests/test_util.cpp)
+
+In addition to unit tests, the pathfinding algorithms have been verified to find the shortest path in several `.scen` files through benchmarking (which also automatically checks that the algorithms work correctly). Benchmarking is covered in the next section.
 
 ## Benchmarks
 For running benchmarks, download maps (`.map`) and scenario files (`.scen`) from https://movingai.com/benchmarks/grids.html.
@@ -19,7 +21,7 @@ Example:
 build/tests --benchmarks tests/benchmarks
 ```
 Unit tests will be skipped, and all the scenario files within that directory will be executed.
-The output of benchmarks printed in standard output, in the following format with comma delimiters:
+The output of the benchmarks is printed in standard output, in the following format with comma delimiters (CSV, suitable for importing to a spreadsheet application):
 
 | map name (string) | scenario optimal length (float) | algo1 time (float, microseconds) | algo2 time | ... | |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
