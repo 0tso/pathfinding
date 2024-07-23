@@ -35,7 +35,7 @@ cmake --build build --config Release
 When using vcpkg, set the `preset` variable to `vcpkg` instead of `release` in the first command.
 In case of [missing system dependencies](https://learn.microsoft.com/en-us/vcpkg/troubleshoot/build-failures#missing-system-dependencies) (for example from `alsa`), install those manually.
 
-After building, the executable `pathfinding` can be found and executed in the newly created `build` subdirectory.
+After building, the executable `pathfinding_visualizer` can be found and executed in the newly created `build` subdirectory.
 
 ## Tests & benchmarks
 To build and execute the tests (provided in the [tests](./tests/) folder), run the following commands:
