@@ -66,7 +66,7 @@ Therefore only jump nodes of type 1 need to be added to the priority queue.
 
 In any case, this significant reduction in priority queue modifications in large areas accounts for the other 50% speed increase JPS has over pure A* according to [3].
 
-Thanks to these optimizations, in my benchmarks for the scenario file for the Starcraft 1 map "Aftershock", A* combined with JPS pruning was on average over 60% faster than pure A* for distances greater than 200. For distances smaller than 200, however, it was on average 9% slower. This is because over smaller distances, JPS still scans over all the possible nodes, which will take more time than adding a couple of nodes in the direction of the goal node in the priority queue as pure A* does.
+Thanks to these optimizations, in my benchmarks for the scenario file for the Starcraft 1 map "Aftershock", A* combined with JPS pruning was on average over 66% faster than pure A* for distances greater than 150. For distances smaller than 150, however, it was on average 1700% slower. This is because over smaller distances JPS still scans over all the possible nodes around the starting node, while A* will only expand a handful of nodes. This difference is especially pronounced over very small differences in the 0–50 range, where A* will only take a handful of microseconds, while JPS will generally take 200+ microseconds.
 
 More detailed benchmarks can be found in [testing_and_benchmarking.md](./testing_and_benchmarks.md).
 
@@ -79,6 +79,14 @@ If a path needs to be created for agents that can only travel in cardinal direct
 1. [A* search algorithm (Wikipedia)](https://en.wikipedia.org/wiki/A*_search_algorithm)
 2. "Online Graph Pruning for Pathfinding on Grid Maps", Harabor and Grastien, 2011
 3. \[Game AI Pro 2\] "JPS+: An Extreme A* Speed Optimization for Static Uniform Cost Grids", Rabin and Silva, 2015
+
+### Performance remarks
+I found out that the code that initializes the map state takes about 1000x more time than the pathfinding algorithms themselves for small distances; about 2000-6000 microseconds per run, which is an unacceptably long time.
+
+A remedy I realized is that instead of initializing all the internal node structures for each run, I can add a "run counter" to each node, which can then be checked every time any node is accessed.
+If this "run counter" does not match with the current run ID (which is incremented with each run), the node must be initialized to its default state, only after which can it be inspected.
+
+This change improved performance by about 2000 microseconds, i.e. about 1000x over small distances.
 
 ### Testing and benchmarking
 For information on testing and benchmarking, see [testing_and_benchmarking.md](./testing_and_benchmarks.md).

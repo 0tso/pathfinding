@@ -166,10 +166,9 @@ void pathfinding_loop(Algorithm* algo,
                         State* state, State* render_state,
                         std::mutex* render_mut, std::chrono::duration<int, std::milli> sleep_time)
 {
-    algo->init(state);
-
-    Algorithm::Result::Type res;
     sf::Clock timer;
+    algo->init(state);
+    Algorithm::Result::Type res;
     while((res = algo->update()) == Algorithm::Result::Type::EXECUTING)
     {
         if(sleep_time != std::chrono::duration<int, std::milli>::zero())

@@ -18,7 +18,7 @@ inline bool approx_equal(float a, float b)
 
 void Benchmarker::benchmark()
 {
-    std::cout << std::fixed << std::setprecision(2);
+    std::cout << std::fixed << std::setprecision(1);
     std::cout << "map_name,scenario_distance,";
     for(const auto [algo_name, algo] : algorithms)
     {

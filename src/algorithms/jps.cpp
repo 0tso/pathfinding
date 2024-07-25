@@ -85,6 +85,7 @@ void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
     int y = old_y + dir->movement.second;
     auto node_idx = Util::flatten(state->width, x, y);
     auto& node = nodes[node_idx];
+    check_node_initialized(node);
 
     distance += dir->straight ? 1.0f : SQRT_2;
     if(distance >= node.distance)
