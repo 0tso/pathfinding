@@ -70,7 +70,7 @@ Algorithm::Result::Type AStar::update()
 
             neighbour.status = InternalNode::Status::UNEXAMINED;
             float approx_total_path_length =
-                new_dist + Util::euclidian_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
+                new_dist + Util::diagonal_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.emplace(approx_total_path_length, neighbour_idx);
         }
     }

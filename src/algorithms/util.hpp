@@ -164,6 +164,18 @@ namespace Util
     }
 
     /**
+     * Returns the distance between the two points as if there were no obstacles between them.
+     */
+    inline float diagonal_distance(int x1, int y1, int x2, int y2)
+    {
+        auto x_diff = std::abs(x2 - x1);
+        auto y_diff = std::abs(y2 - y1);
+        int diagonal = std::min(x_diff, y_diff);
+        int straight = std::max(x_diff, y_diff) - diagonal;
+        return diagonal * SQRT_2 + straight;
+    }
+
+    /**
      *  Builds the path from the nodes when the end has been reached.
      *  The nodes must be of type T.
      *  Each node object of type T is expected to have a node_index member variable called "prev".

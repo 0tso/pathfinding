@@ -4,9 +4,9 @@ void CommonAlgorithm::init(State* s)
 {
     state = s;
 
+    result = Algorithm::Result{};
     nodes.clear();
-    while(!open.empty())
-        open.pop();
+    open = std::priority_queue<queue_pair, std::vector<queue_pair>, std::greater<queue_pair>>();
 
     // Initialize the nodes vector.
     for(int i = 0; i < s->map.size(); ++i)

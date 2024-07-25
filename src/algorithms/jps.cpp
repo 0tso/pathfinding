@@ -100,7 +100,7 @@ void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
     // A lambda function to add the current node to the open queue
     auto add_to_open = [&]()
     {
-        float approx_distance = node.distance + Util::euclidian_distance(x, y, state->end.x, state->end.y);
+        float approx_distance = node.distance + Util::diagonal_distance(x, y, state->end.x, state->end.y);
         open.emplace(approx_distance, node_idx);
     };
 
