@@ -9,12 +9,19 @@
 #include "all_algorithms.hpp"
 #include "algorithms/util.hpp"
 
+/**
+ * Approximate floating point comparison.
+ * Adapted from https://stackoverflow.com/a/32334103, license: CC BY-SA 4.0
+ */
 inline bool approx_equal(float a, float b)
 {
-    auto a_abs = std::abs(a);
-    auto b_abs = std::abs(b);
-    return std::abs(a - b) <= ((a_abs < b_abs ? b_abs : a_abs) * 0.0001f);
+    if(a == b)
+        return true;
+
+    static constexpr float epsilon = std::numeric_limits<float>::epsilon() * 128.0f;
+    return std::abs(a - b) < std::max(std::numeric_limits<float>::min(), std::abs(a + b) * epsilon);
 }
+
 
 void Benchmarker::benchmark()
 {
@@ -26,6 +33,7 @@ void Benchmarker::benchmark()
     }
     std::cout << std::endl;
 
+    State* previous_state = nullptr;
     for(const auto& scenario : scenarios)
     {
         State* state = &maps[scenario.map_name];
@@ -38,6 +46,12 @@ void Benchmarker::benchmark()
 
         for(const auto [algo_name, algo] : algorithms)
         {
+            if(state != previous_state)
+            {
+                // For allocating and preprocessing maps
+                algo->init(state);
+            }
+
             auto start = std::chrono::high_resolution_clock::now();
             algo->init(state);
             auto after_init = std::chrono::high_resolution_clock::now();
@@ -50,7 +64,7 @@ void Benchmarker::benchmark()
 
             if(!approx_equal(res.length, scenario.optimal_length))
             {
-                std::cout << "ERROR: fails for " << algo_name << " which returns " << res.length << std::endl;
+                std::cout << "ERROR: " << scenario.map_name << " " << scenario.id << " fails for " << algo_name << " which returns " << res.length << std::endl;
                 return;
             }
 
@@ -59,5 +73,7 @@ void Benchmarker::benchmark()
             std::cout << total << ",";
         }
         std::cout << std::endl;
+
+        previous_state = state;
     }
 }

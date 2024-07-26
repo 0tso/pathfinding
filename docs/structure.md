@@ -27,7 +27,7 @@ Like Dijkstra's algorithm, A* maintains a sorted priority queue of nodes to expl
 In Dijkstra's algorithm, the priority queue is sorted using the function `g(x)`, denoting the distance of node `x` from the starting node. This way Dijkstra's algorithm guarantees optimality: if it only selects the node closest to the start, when it eventually expands the goal node, all nodes after it are guaranteed to be either equally far away or even farther away from the start, so their distance would be even greater. Thus the shortest path is found.
 
 A* works on the same principles, but instead of sorting the priority queue using `g(x)`, it sorts the priority queue using the sum of `g(x) + h(x)` where `h(x)` is a heuristic function estimating the distance from node `x` to the goal node. This way A* can find a path to the goal node quicker by also prioritizing an estimated distance to the goal. If this estimation is never greater than the actual distance, A* is guaranteed to find the optimal path.
-In the present project, this is done by using euclidian distance as the heuristic: this is guaranteed to be smaller or equal to the shortest path.
+In the present project, this is done by using diagonal (octile) distance as the heuristic: this is guaranteed to be smaller or equal to the shortest path.
 
 In short, in each loop iteration, A* examines and pops the "best" node (judged by `g(x) + h(x)`) from its priority queue, checks if shorter paths (than previously encountered) to its neighbours can be achieved through this node, and adds those shorter paths with their heuristic to the priority queue. When A* encounters the goal node, the shortest path has been found.
 
@@ -63,6 +63,7 @@ Though in the original paper [2] both are regarded as nodes of equal importance,
 This is because all nodes reachable from them are already explored during the original complete scan.
 As the picture shows, all nodes that a new scan from node 2 would explore are already explored with equal or smaller distance from the original node.
 Therefore only jump nodes of type 1 need to be added to the priority queue.
+This approach is argued for in source [5], a later article on improving JPS by its original creators.
 
 In any case, this significant reduction in priority queue modifications in large areas accounts for the other 50% speed increase JPS has over pure A* according to [3].
 
@@ -79,6 +80,8 @@ If a path needs to be created for agents that can only travel in cardinal direct
 1. [A* search algorithm (Wikipedia)](https://en.wikipedia.org/wiki/A*_search_algorithm)
 2. "Online Graph Pruning for Pathfinding on Grid Maps", Harabor and Grastien, 2011
 3. \[Game AI Pro 2\] "JPS+: An Extreme A* Speed Optimization for Static Uniform Cost Grids", Rabin and Silva, 2015
+4. "The JPS Pathfinding System", Harabor and Grastien, 2012
+5. "Improving Jump Point Search", Harabor and Grastien, 2014
 
 ### Performance remarks
 I found out that the code that initializes the map state takes about 1000x more time than the pathfinding algorithms themselves for small distances; about 2000-6000 microseconds per run, which is an unacceptably long time.

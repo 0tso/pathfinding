@@ -6,6 +6,10 @@ Algborithms compared:
 * A*
 * Jump point search
 
+For a more detailed look at how the aforementioned algorithms work, see [structure.md](./docs/structure.md). 
+
+For graphs of how they perform against each other, see [testing_and_benchmarks.md](./docs/testing_and_benchmarks.md).
+
 ## Prerequisites
 The following programs must be installed before building the application (the italicized programs are installed by default on Ubuntu):
 * (_A C++ compiler like GCC_)
