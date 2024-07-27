@@ -12,7 +12,7 @@ The following modules are unit tested extensively:
 
 The individual tested items can be read from the `SECTION` names of the test files.
 
-In addition to unit tests, the pathfinding algorithms have been verified to find the shortest path in several `.scen` files through benchmarking (which automatically checks that the found path and the optimal path match). Benchmarking is covered in the next section.
+In addition to unit tests, the pathfinding algorithms have been verified to find the shortest path in several `.scen` files and 10 000 scenarios through benchmarking (which automatically checks that the found path and the optimal path match). Benchmarking is covered in the next section.
 
 ## Benchmarks
 For running benchmarks, download maps (`.map`) and scenario files (`.scen`) from https://movingai.com/benchmarks/grids.html.

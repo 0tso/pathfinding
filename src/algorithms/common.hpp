@@ -23,7 +23,7 @@
  */
 struct InternalNode
 {
-    enum Status : uint8_t
+    enum Status : bool
     {
         UNEXAMINED,
         EXAMINED

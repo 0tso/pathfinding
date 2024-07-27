@@ -195,7 +195,7 @@ namespace Util
                     break;
                 }
                 auto [x, y] = expand(state.width, prev_idx);
-                res.path.emplace_back(x, y);
+                res.path.push_back({x, y});
                 if(!(x == state.end.x && y == state.end.y))
                     state.map[prev_idx] = Node::PATH;
                 prev_idx = prev_node.prev;

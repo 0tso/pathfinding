@@ -19,5 +19,5 @@ You can press Q to place the starting point under your cursor, and E to place th
 There are multiple command line options to input **after** starting the program:
 
 * `exit` exits the program.
-* `start` starts a pathfinding algorithm. It requires one additional argument after it, delimted by a space: the name of the pathfinding algorithm. This can be either `A*` or `JPS`. One optional command line argument can be given: the amount of milliseconds (integer) to wait after each pathfinding logic update. This is useful for visualization.
+* `start` starts a pathfinding algorithm. It requires one additional argument after it, delimted by a space: the name of the pathfinding algorithm. This can be one of the following: `A*`, `JPS`, `BBFS`. One optional command line argument can be given: the amount of milliseconds (integer) to wait after each pathfinding logic update. This is useful for visualization.
     * Example: `start A* 5` starts pathfinding with A* and waits 5 milliseconds between each pathfinding update.
