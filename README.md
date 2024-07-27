@@ -5,6 +5,7 @@ A C++ project for comparing the performance of different pathfinding algorithms 
 Algborithms compared:
 * A*
 * Jump point search
+* Non-optimal bidirectional breadth-first search
 
 For a more detailed look at how the aforementioned algorithms work, see [structure.md](./docs/structure.md). 
 

@@ -6,7 +6,6 @@
 
 #include "benchmarker.hpp"
 #include "main.hpp"
-#include "all_algorithms.hpp"
 #include "algorithms/util.hpp"
 
 /**
@@ -27,7 +26,7 @@ void Benchmarker::benchmark()
 {
     std::cout << std::fixed << std::setprecision(1);
     std::cout << "map_name,scenario_distance,";
-    for(const auto [algo_name, algo] : algorithms)
+    for(const auto [algo_name, algo] : algos)
     {
         std::cout << algo_name << ",";
     }
@@ -44,7 +43,7 @@ void Benchmarker::benchmark()
             << "," << scenario.optimal_length
             << ",";
 
-        for(const auto [algo_name, algo] : algorithms)
+        for(const auto [algo_name, algo] : algos)
         {
             if(state != previous_state)
             {
@@ -64,7 +63,7 @@ void Benchmarker::benchmark()
 
             if(!approx_equal(res.length, scenario.optimal_length))
             {
-                std::cout << "NON_OPTIMAL_DIFF:" << std::abs(scenario.optimal_length - res.length);
+                std::cout << "NON_OPTIMAL_DIFF:" << std::abs(scenario.optimal_length - res.length) << ",";
             }
             else
             {

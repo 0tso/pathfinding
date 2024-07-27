@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <tuple>
 
 #include "state.hpp"
+#include "algorithms/algorithm.hpp"
 
 struct Scenario
 {
@@ -14,6 +16,8 @@ struct Scenario
     float optimal_length;
     int id;
 };
+
+extern std::vector<std::pair<std::string, Algorithm*>> algos;
 
 extern std::vector<Scenario> scenarios;
 extern std::unordered_map<std::string, State> maps;

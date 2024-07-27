@@ -8,8 +8,11 @@
 
 #include "main.hpp"
 #include "benchmarker.hpp"
+#include "all_algorithms.hpp"
 #include "hog2/ScenarioLoader.h"
 #include "hog2/Map.h"
+
+std::vector<std::pair<std::string, Algorithm*>> algos;
 
 std::vector<Scenario> scenarios;
 std::unordered_map<std::string, State> maps;
@@ -62,6 +65,7 @@ int main(int argc, char** argv)
     Catch::Session session;
 
     std::string benchmark_str;
+    std::string algos_str;
     int benchmark_amount = 0;
 
     using namespace Catch::Clara;
@@ -69,12 +73,33 @@ int main(int argc, char** argv)
         | Opt(benchmark_str, "benchmark directory")
         ["--benchmarks"]("skip the unit tests, instead read and execute benchmarks from the following directory.")
         | Opt(benchmark_amount, "benchmark amount")
-        ["--amount"]("only execute this amount of benchmarking scenarios, sampled randomly from all files");
+        ["--amount"]("only execute this amount of benchmarking scenarios, sampled randomly from all files")
+        | Opt(algos_str, "algorithms")
+        ["--algorithms"]("only benchmark the specified algorithms, delimited by a comma: --algorithms A*,JPS");
 
     session.cli(cli);
     int ret = session.applyCommandLine(argc, argv);
     if(ret != 0)
         return ret;
+    
+    if(algos_str != "")
+    {
+        size_t idx;
+        while((idx = algos_str.find(',')) != std::string::npos)
+        {
+            auto substr = algos_str.substr(0, idx);
+            algos.emplace_back(substr, algorithms.at(substr));
+            algos_str.erase(0, idx + 1);
+        }
+        if(algos_str != "")
+        {
+            algos.emplace_back(algos_str, algorithms.at(algos_str));
+        }
+    }
+    else
+    {
+        algos = {algorithms.begin(), algorithms.end()};
+    }
     
     if(benchmark_str != "")
     {

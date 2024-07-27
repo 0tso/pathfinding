@@ -23,12 +23,14 @@ void BBFS::init(State* s)
     auto& start_node = nodes[start_index];
     check_node_initialized(start_node);
     start_node.distance = 0.0f;
+    start_node.status = BBFSInternal::Status::SEARCHED_START;
     start_queue.push(start_index);
 
     auto end_index = Util::flatten(s->width, s->end.x, s->end.y);
     auto& end_node = nodes[end_index];
     check_node_initialized(end_node);
     end_node.distance = 0.0f;
+    end_node.status = BBFSInternal::Status::SEARCHED_END;
     end_queue.push(end_index);
 }
 
