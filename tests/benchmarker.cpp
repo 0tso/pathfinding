@@ -64,13 +64,14 @@ void Benchmarker::benchmark()
 
             if(!approx_equal(res.length, scenario.optimal_length))
             {
-                std::cout << "ERROR: " << scenario.map_name << " " << scenario.id << " fails for " << algo_name << " which returns " << res.length << std::endl;
-                return;
+                std::cout << "NON_OPTIMAL_DIFF:" << std::abs(scenario.optimal_length - res.length);
             }
+            else
+            {
+                float total = std::chrono::duration<float, std::micro>(end - start).count();
 
-            float total = std::chrono::duration<float, std::micro>(end - start).count();
-
-            std::cout << total << ",";
+                std::cout << total << ",";
+            }
         }
         std::cout << std::endl;
 

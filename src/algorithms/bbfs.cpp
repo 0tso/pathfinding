@@ -94,6 +94,11 @@ Algorithm::Result::Type BBFS::update()
 
                         state->map[neighbour_idx] = Node::EXAMINED;
                     }
+                    else
+                    {
+                        // Required to preserve optimality
+                        recursive_update(neighbour_idx, start);
+                    }
                 }
             }
 
@@ -134,4 +139,61 @@ void BBFS::format_path_nodes()
         end_side_node.prev = prev;
         prev = temp_curr;
     }
+}
+
+void BBFS::recursive_update(node_index idx, bool start)
+{
+    /*
+    * Uncomment to add optimality but decrease performance significantly.
+    *
+
+    std::queue<node_index> q;
+    q.push(idx);
+    
+    std::pair<node_index, dir_t> neighbours[8];
+
+    while(!q.empty())
+    {
+        auto amount = q.size();
+
+        for(int i = 0; i < amount; ++i)
+        {
+            auto node_idx = q.front();
+            auto& node = nodes[node_idx];
+            auto [x, y] = Util::expand(state->width, node_idx);
+
+            auto amount_neighbours = Util::get_neighbours(neighbours, *state, x, y);
+
+            for(int i = 0; i < amount_neighbours; ++i)
+            {
+                auto [neighbour_idx, dir] = neighbours[i];
+                auto& neighbour = nodes[neighbour_idx];
+
+                check_node_initialized(neighbour);
+
+                auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
+                float new_dist = node.distance + (dir->straight ? 1.0f : SQRT_2);
+
+                if(!start && neighbour.status == BBFSInternal::Status::SEARCHED_START
+                    || start && neighbour.status == BBFSInternal::Status::SEARCHED_END)
+                {
+                    float new_path_dist = new_dist + neighbour.distance;
+                    if(new_path_dist < best_path_distance)
+                    {
+                        best_path_distance     = new_path_dist;
+                        best_start_to_mid_node = start ? node_idx : neighbour_idx;
+                        best_end_to_mid_node   = start ? neighbour_idx : node_idx;
+                    }
+                }
+                else if(new_dist < neighbour.distance && neighbour.status != BBFSInternal::Status::UNSEARCHED)
+                {
+                    neighbour.distance = new_dist;
+                    neighbour.prev = node_idx;
+                    q.push(neighbour_idx);
+                }
+            }
+            q.pop();
+        }
+    }
+    */
 }

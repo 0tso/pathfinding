@@ -20,4 +20,4 @@ Toinen osakysymys koskee määrittelydokumentissa luvattua neljään suuntaan ku
 
 Joka tapauksessa, muun tehtävän puutteessa ajattelin lähteä hieman määrittelydokumentin ulkopuolelle ja implementoida muita algoritmeja tahi erilaisia optimoidumpia versioita A*- ja JPS-algoritmeista, esimerkiksi potentiaalisesti JPS+. En välttämättä kirjoittaisi näistä yhtä tarkkaa selitystä, koska dokumentaation kirjoittaminen vaatii huomattavan määrän aikaa verrattuna itse algoritmin implementoimiseen (ja mitä tärkeämpää, se on huomattavasti vähemmän hauskaa).
 
-Implementoinkin jo ekstrana kaksisuuntaisen leveyshaun ([bbfs.hpp](../../src/algorithms/bbfs.hpp)), joka toimii optimaalisesti kaikissa muissa tilanteissa paitsi muutimassa skenaario-tiedostojen skenaarioissa itselleni tuntemattomista syistä (tähänkin voisin saada vinkkejä 😁).
+Implementoinkin jo ekstrana kaksisuuntaisen leveyshaun ([bbfs.hpp](../../src/algorithms/bbfs.hpp)), aluksi osittain ei-optimaalisen version joka toimi paikoittain A*:ta nopeammin, ja myöhemmin optimaalisen, joka toimii yleisesti A*:ä hitaammin.
