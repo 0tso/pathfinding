@@ -32,20 +32,12 @@ public:
     Result::Type update();
 
 private:
-    uint32_t current_run_id = 0;
+    uint32_t curr_run_id = 0;
 
     std::vector<BBFSInternal> nodes;
 
     std::queue<node_index> start_queue;
     std::queue<node_index> end_queue;
-
-    inline void check_node_initialized(BBFSInternal& node)
-    {
-        if(node.last_run != current_run_id)
-        {
-            node = BBFSInternal{.last_run = current_run_id};
-        }
-    }
 
     node_index best_start_to_mid_node = NULL_NODE_IDX;
     node_index best_end_to_mid_node   = NULL_NODE_IDX;

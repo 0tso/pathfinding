@@ -56,21 +56,6 @@ protected:
 
     // See the next function for details about this variable.
     uint32_t curr_run_id = 0;
-
-    /**
-     * Checks if the current node is initialized.
-     * If the node's "last_run" variable doesn't match curr_run_id, sets the node to its default-initialized state.
-     * This function exists so that the "nodes" vector does not have to be initialized on every run.
-     * 
-     * @param node The node to check
-     */
-    inline void check_node_initialized(InternalNode& node)
-    {
-        if(node.last_run != curr_run_id)
-        {
-            node = InternalNode{.last_run = curr_run_id};
-        }
-    }
 };
 
 #endif

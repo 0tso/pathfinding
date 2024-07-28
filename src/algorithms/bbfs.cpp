@@ -3,7 +3,7 @@
 void BBFS::init(State* s)
 {
     state = s;
-    current_run_id++;
+    curr_run_id++;
     result = Algorithm::Result{};
 
     best_start_to_mid_node = NULL_NODE_IDX;
@@ -21,14 +21,14 @@ void BBFS::init(State* s)
 
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     auto& start_node = nodes[start_index];
-    check_node_initialized(start_node);
+    Util::lazy_initialize(curr_run_id, start_node);
     start_node.distance = 0.0f;
     start_node.status = BBFSInternal::Status::SEARCHED_START;
     start_queue.push(start_index);
 
     auto end_index = Util::flatten(s->width, s->end.x, s->end.y);
     auto& end_node = nodes[end_index];
-    check_node_initialized(end_node);
+    Util::lazy_initialize(curr_run_id, end_node);
     end_node.distance = 0.0f;
     end_node.status = BBFSInternal::Status::SEARCHED_END;
     end_queue.push(end_index);
@@ -69,7 +69,7 @@ Algorithm::Result::Type BBFS::update()
                 auto [neighbour_idx, dir] = neighbours[i];
                 auto& neighbour = nodes[neighbour_idx];
 
-                check_node_initialized(neighbour);
+                Util::lazy_initialize(curr_run_id, neighbour);
 
                 auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
                 float new_dist = node.distance + (dir->straight ? 1.0f : SQRT_2);

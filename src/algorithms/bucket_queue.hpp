@@ -8,7 +8,6 @@
 /**
  * Simple, crude bucket queue.
  * Does not destruct objects!  Only use for "trivially copyable" types like int, POD, etc.
- * Does not deallocate memory! Only construct once.
  * 
  * Assumes that the key values never decrease, only increase.
  * 
@@ -40,7 +39,7 @@ public:
         this->curr = 0;
         this->curr_value = 0.0f;
 
-        buffer = new char[internal_bucket_size * bucket_amount];
+        buffer.reserve(bucket_amount * internal_bucket_size);
         for(int i = 0; i < bucket_amount; ++i)
         {
             new (at(i)) BucketHeader{};
@@ -106,7 +105,8 @@ public:
 
             uint32_t new_bucket_size = bucket_size * 2;
             uint32_t new_internal_bucket_size = (new_bucket_size * sizeof(Element)) + sizeof(BucketHeader);
-            char* new_buffer = new char[bucket_amount * new_internal_bucket_size];
+            std::vector<char> new_buffer;
+            new_buffer.reserve(new_internal_bucket_size * bucket_amount);
 
             for(int i = 0; i < bucket_amount; ++i)
             {
@@ -116,8 +116,7 @@ public:
                 memcpy(new_h + 1, old_h + 1, old_h->size * sizeof(Element));
             }
 
-            delete[] buffer;
-            buffer = new_buffer;
+            buffer.swap(new_buffer);
             bucket_size = new_bucket_size;
             internal_bucket_size = new_internal_bucket_size;
 
@@ -181,7 +180,7 @@ private:
     uint32_t internal_bucket_size;
     uint32_t bucket_amount;
 
-    char* buffer; 
+    std::vector<char> buffer;
     int realloc_amount = 0;
 };
 

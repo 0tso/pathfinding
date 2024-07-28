@@ -202,6 +202,19 @@ namespace Util
         }
         std::reverse(res.path.begin(), res.path.end());
     }
+
+    /**
+     * Checks if node is initialized for the specified run.
+     * If not, default-constructs it.
+     */
+    template<typename T>
+    void lazy_initialize(uint32_t run_id, T& node)
+    {
+        if(node.last_run != run_id)
+        {
+            node = T{.last_run = run_id};
+        }
+    }
 }
 
 #endif

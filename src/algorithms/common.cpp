@@ -17,7 +17,7 @@ void CommonAlgorithm::init(State* s)
     
     // Set the correct information of the starting node and add it to the open queue.
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
-    check_node_initialized(nodes[start_index]);
+    Util::lazy_initialize(curr_run_id, nodes[start_index]);
     nodes[start_index].distance = 0.0f;
     open.emplace(0.0f, start_index);
 }

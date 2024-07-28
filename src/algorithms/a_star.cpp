@@ -39,7 +39,7 @@ Algorithm::Result::Type AStar::update()
     {
         auto [neighbour_idx, dir] = neighbours[i];
         auto& neighbour = nodes[neighbour_idx];
-        check_node_initialized(neighbour);
+        Util::lazy_initialize(curr_run_id, neighbour);
         auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
         
         // All perpendicular neighbours are one unit of distance away
