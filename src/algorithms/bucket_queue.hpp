@@ -15,6 +15,9 @@
  * This interval increases every time a bucket is depleted.
  * Designed for A* with a heuristic like octile_distance.
  * 
+ * Usage:
+ * After every round of successor-generating, call update_minimum().
+ * 
  */
 template<typename T>
 class BucketQueue
@@ -37,7 +40,7 @@ public:
         this->bucket_size = bucket_size;
         this->internal_bucket_size = (this->bucket_size * sizeof(Element)) + sizeof(BucketHeader);
         this->curr = 0;
-        this->curr_value = 0.0f;
+        this->curr_value = std::numeric_limits<float>::max();
 
         buffer.reserve(bucket_amount * internal_bucket_size);
         for(int i = 0; i < bucket_amount; ++i)
@@ -46,6 +49,10 @@ public:
         }
     }
 
+    /**
+     * Checks if the queue is empty.
+     * Only call after update_minimum().
+     */
     bool empty()
     {
         return empty(front());
@@ -65,25 +72,13 @@ public:
         Element* f           = last(header);
 
         header->size--;
-
-        auto begin = curr;
-        while(empty(header))
-        {
-            curr_value += interval;
-            curr++;
-            check_mod(bucket_amount, curr);
-            if(curr == begin)
-                break;
-            
-            header = front();
-        }
         
         return *f;
     }
 
     void push(float value, T object)
     {
-        if(empty())
+        if(curr_value == std::numeric_limits<float>::max())
         {
             curr_value = value;
         }
@@ -121,6 +116,26 @@ public:
             internal_bucket_size = new_internal_bucket_size;
 
             push(value, object);
+        }
+    }
+
+    void update_minimum()
+    {
+        auto header = front();
+
+        auto begin = curr;
+        while(empty(header))
+        {
+            curr_value += interval;
+            curr++;
+            check_mod(bucket_amount, curr);
+            if(curr == begin)
+            {
+                curr_value == std::numeric_limits<float>::max();
+                break;
+            }
+            
+            header = front();
         }
     }
 
