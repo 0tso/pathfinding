@@ -96,6 +96,8 @@ TEST_CASE("Map data usage", "[map]")
 TEST_CASE("heuristic functions", "[maths]")
 {
     auto sqrt_2_heuristic = euclidian_distance(0, 0, 1, 1);
-    REQUIRE(sqrt_2_heuristic < SQRT_2);
     REQUIRE_THAT(sqrt_2_heuristic, Catch::Matchers::WithinAbs(std::sqrt(2), 0.0001));
+
+    auto diagonal_heuristic = diagonal_distance(0, 0, 3, 3);
+    REQUIRE_THAT(diagonal_heuristic, Catch::Matchers::WithinAbs(3 * std::sqrt(2), 0.0001));
 }
