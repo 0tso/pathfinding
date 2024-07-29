@@ -142,6 +142,25 @@ TEST_CASE("write_curr and read_curr updated", "[data_structure]")
     REQUIRE(q.empty());
 }
 
+TEST_CASE("clear", "[data_structure]")
+{
+    BucketQueue<int> q{1.0f, 5, 1};
+
+    q.push(0.5f, 23);
+    q.push(1.5f, 23);
+    q.push(2.5f, 23);
+
+    q.pop();
+    q.update_write();
+    q.clear();
+
+    REQUIRE(q.empty());
+    q.push(8.0f, 61);
+    q.push(9.0f, 1);
+    REQUIRE(q.pop().object == 61);
+    REQUIRE(q.pop().object == 1);
+    REQUIRE(q.empty());
+}
 
 TEST_CASE("benchmark against std::priority_queue", "[!benchmark]")
 {

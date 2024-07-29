@@ -3,7 +3,7 @@
 A C++ project for comparing the performance of different pathfinding algorithms and inspecting their behaviour visually.
 
 Algborithms compared:
-* A*
+* A* (a basic implementation _vs._ a more optimized version)
 * Jump point search
 * Non-optimal bidirectional breadth-first search
 

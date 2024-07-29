@@ -7,6 +7,11 @@
 
 /**
  * Simple, crude bucket queue.
+ * 
+ * 
+ * -----------------------------
+ * Usage notes:
+ *
  * Does not destruct objects!  Only use for "trivially copyable" types like int, POD, etc.
  * 
  * Assumes that the key values never decrease, only increase.
@@ -16,8 +21,39 @@
  * Designed for A* with a heuristic like euclidian distance.
  * Be careful that your heuristic doesn't ever decrease more than the movement cost changes, like with diagonal_distance.
  * 
- * Usage:
  * After every round of successor-generating, call update_write().
+ * 
+ * 
+ * -----------------------------
+ * Implementation notes:
+ * 
+ * The queue is a circular buffer of buckets.
+ * 
+ * Each bucket contains a circular buffer of Elements.
+ * The BucketHeader of the circular buffer is at the memory location "index * internal_bucket_size".
+ * The Elements start after it at "index * internal_bucket_size + sizeof(BucketHeader)".
+ * To get the first Element:      "index * internal_bucket_size + sizeof(BucketHeader) + header->read * sizeof(Element)"
+ * 
+ * If a single bucket exceeds capacity, the whole ring buffer is reallocated and copied to a new location.
+ * In that case, every bucket size is doubled.
+ * 
+ * Each insertion into the queue is based on two variables:
+ *  - curr_value = the basis from which to calculate the index, i.e. the lowest value in the queue
+ *  - write_curr = the queue's circular buffer's write, i.e. offset to indices
+ * When an Element is inserted, the index is calculated like so:
+ *  - index = (write_curr + (uint)(value / interval)) % bucket_amount
+ * 
+ * When update_write() is called, these two values are updated.
+ *  -> write_curr matches with the lowest nonempty bucket (read_curr)
+ *  -> curr_value matches with the value of this bucket (if empty, set to FLOAT_INFINITY)
+ * It cannot be automatically called after every single pop() internally because after popping, the same value can be added back.
+ * Therefore call update_write() only after you're sure no smaller values than the currently smallest value will be added.
+ * 
+ * When pop() is called:
+ * read_curr holds the current lowest bucket. Remove one Element from that circular buffer.
+ * If the current bucket is now empty, increment read_curr until a nonempty bucket is found.
+ * Due to this, the read_curr can also be decremented if a value is added to a lower bucket later, before a call to update_write().
+ * 
  * 
  */
 template<typename T>
@@ -53,7 +89,6 @@ public:
 
     /**
      * Checks if the queue is empty.
-     * Only call after update_write().
      */
     bool empty()
     {
@@ -176,6 +211,15 @@ public:
             curr_value += interval * mod_diff(bucket_amount, write_curr, read_curr);
             write_curr = read_curr;
         }
+    }
+
+    void clear()
+    {
+        for(int i = 0; i < bucket_amount; ++i)
+        {
+            new (at(i)) BucketHeader{};
+        }
+        curr_value = std::numeric_limits<float>::infinity();
     }
 
     int get_realloc_amount()

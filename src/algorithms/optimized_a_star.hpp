@@ -27,7 +27,7 @@ private:
     };
 
     std::vector<InternalNode> nodes;
-    BucketQueue<node_index> open;
+    BucketQueue<node_index> open{0.1f, 30, 5};
     uint32_t curr_run_id;
 };
 

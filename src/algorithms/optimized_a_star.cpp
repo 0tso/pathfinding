@@ -10,7 +10,7 @@ void OptimizedAStar::init(State* s)
     state = s;
 
     result = Algorithm::Result{};
-    open = BucketQueue<node_index>(0.1f, 30, 5);
+    open.clear();
 
     // Initialize the nodes vector.
     if(nodes.capacity() != s->map.size())
@@ -84,7 +84,6 @@ Algorithm::Result::Type OptimizedAStar::update()
                 result.length = neighbour.distance;
                 result.type = Result::Type::SUCCESS;
 
-                std::cout << "resized " << open.get_realloc_amount() << " times." << std::endl;
                 return Result::Type::SUCCESS;
             }
             else

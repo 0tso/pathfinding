@@ -71,6 +71,18 @@ Thanks to these optimizations, in my benchmarks for the scenario file for the St
 
 More detailed benchmarks can be found in [testing_and_benchmarking.md](./testing_and_benchmarks.md).
 
+### BBFS
+BBFS stands for bidirectional breadth-first search. More information at
+* https://en.wikipedia.org/wiki/Bidirectional_search
+* https://en.wikipedia.org/wiki/Breadth-first_search
+
+In a uniform-cost grid, BBFS would return an optimal path. But because the grids used in this project are 8-way and each diagonal move has a cost of sqrt(2), BBFS does not always return the optimal path.
+Otherwise it could seriously outcompete A* in large maps due to using a simple queue instead of a priority queue like A*.
+
+### Optimized A*
+The following optimizations have been applied to `OptimizedA*`:
+* [O(1) bucket queue](../src/algorithms/bucket_queue.hpp) | +40% speed
+
 ### 4-way pathing instead of 8-way pathing
 The previous images and the algorithms implemented for the project assume that each node has 8 neighbours, i.e. that diagonal movement is allowed. However, in the present project diagonal movement is not allowed for nodes that have neighbouring walls in either component direction of the diagonal (so entities using the pathing are assumed to have greater than 0 size).
 
