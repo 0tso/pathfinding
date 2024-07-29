@@ -13,10 +13,11 @@
  * 
  * Values can only be added within the interval [curr_value, curr_value + interval * bucket_amount]
  * This interval increases every time a bucket is depleted.
- * Designed for A* with a heuristic like octile_distance.
+ * Designed for A* with a heuristic like euclidian distance.
+ * Be careful that your heuristic doesn't ever decrease more than the movement cost changes, like with diagonal_distance.
  * 
  * Usage:
- * After every round of successor-generating, call update_minimum().
+ * After every round of successor-generating, call update_write().
  * 
  */
 template<typename T>
@@ -39,8 +40,9 @@ public:
         this->bucket_amount = bucket_amount;
         this->bucket_size = bucket_size;
         this->internal_bucket_size = (this->bucket_size * sizeof(Element)) + sizeof(BucketHeader);
-        this->curr = 0;
-        this->curr_value = std::numeric_limits<float>::max();
+        this->read_curr = 0;
+        this->write_curr = 0;
+        this->curr_value = std::numeric_limits<float>::infinity();
 
         buffer.reserve(bucket_amount * internal_bucket_size);
         for(int i = 0; i < bucket_amount; ++i)
@@ -51,17 +53,11 @@ public:
 
     /**
      * Checks if the queue is empty.
-     * Only call after update_minimum().
+     * Only call after update_write().
      */
     bool empty()
     {
         return empty(front());
-    }
-
-    Element top()
-    {
-        assert(!empty());
-        return *last(front());
     }
 
     Element pop()
@@ -69,29 +65,63 @@ public:
         assert(!empty());
 
         BucketHeader* header = front();
-        Element* f           = last(header);
+        Element* f           = read(header);
 
-        header->size--;
+        header->read++;
+        mod_check(bucket_size, header->read);
+
+        if(header->read == header->write)
+        {
+            header->empty = true;
+
+            auto begin = read_curr;
+            while(empty(header))
+            {
+                read_curr++;
+                mod_check(bucket_amount, read_curr);
+                if(read_curr == begin)
+                {
+                    break;
+                }
+                
+                header = front();
+            }
+        }
         
         return *f;
     }
 
     void push(float value, T object)
     {
-        if(curr_value == std::numeric_limits<float>::max())
+        if(curr_value == std::numeric_limits<float>::infinity())
         {
             curr_value = value;
         }
 
         assert(value >= curr_value - 0.01f);
 
-        uint32_t index = (curr + (uint32_t)((value - curr_value) / interval)) % bucket_amount;
+        uint32_t index = (write_curr + (uint32_t)((value - curr_value) / interval)) % bucket_amount;
 
         BucketHeader* header = at(index);
         if(!full(header))
         {
-            new (last_empty(header)) Element{value, object};
-            header->size++;
+            new (write(header)) Element{value, object};
+
+            header->empty = false;
+            header->write++;
+            mod_check(bucket_size, header->write);
+
+            if(empty())
+            {
+                read_curr = index;
+            }
+            else
+            if(mod_diff(bucket_amount, write_curr, index) < mod_diff(bucket_amount, write_curr, read_curr))
+            {
+                // read_curr is ahead of this new lowest bucket, so pull back
+
+                read_curr = index;
+            }
         }
         else
         {
@@ -107,8 +137,23 @@ public:
             {
                 BucketHeader* old_h = at(i);
                 BucketHeader* new_h = (BucketHeader*)&new_buffer[i * new_internal_bucket_size];
-                new_h->size = old_h->size;
-                memcpy(new_h + 1, old_h + 1, old_h->size * sizeof(Element));
+
+                new_h->empty = old_h->empty;
+                new_h->read  = 0;
+                new_h->write = size(old_h);
+                
+                if(old_h->write > old_h->read)
+                {
+                    std::memcpy(read(new_h), read(old_h), size(old_h) * sizeof(Element));
+                }
+                else if(size(old_h) > 0)
+                {
+                    uint32_t before_end = bucket_size - old_h->read;
+                    uint32_t from_zero  = size(old_h) - before_end;
+
+                    std::memcpy(read(new_h),                 read(old_h),    before_end * sizeof(Element));
+                    std::memcpy(read(new_h) + before_end,    old_h + 1,      from_zero  * sizeof(Element));
+                }
             }
 
             buffer.swap(new_buffer);
@@ -119,23 +164,17 @@ public:
         }
     }
 
-    void update_minimum()
+    void update_write()
     {
-        auto header = front();
-
-        auto begin = curr;
-        while(empty(header))
+        if(empty())
         {
-            curr_value += interval;
-            curr++;
-            check_mod(bucket_amount, curr);
-            if(curr == begin)
-            {
-                curr_value == std::numeric_limits<float>::max();
-                break;
-            }
-            
-            header = front();
+            curr_value = std::numeric_limits<float>::infinity();
+            write_curr = read_curr;
+        }
+        else
+        {
+            curr_value += interval * mod_diff(bucket_amount, write_curr, read_curr);
+            write_curr = read_curr;
         }
     }
 
@@ -148,7 +187,9 @@ private:
 
     struct BucketHeader
     {
-        uint32_t size = 0;
+        uint32_t read  = 0;
+        uint32_t write = 0;
+        bool empty     = true;
     };
 
     inline BucketHeader* at(uint32_t index)
@@ -158,37 +199,66 @@ private:
 
     inline BucketHeader* front()
     {
-        return at(curr);
+        return at(read_curr);
+    }
+
+    inline uint32_t size(BucketHeader* b)
+    {
+        if(empty(b))
+            return 0;
+
+        auto diff = mod_diff(bucket_size, b->read, b->write);
+
+        if(diff == 0)
+            return bucket_size;
+        else
+            return diff;
     }
 
     inline bool empty(BucketHeader* b)
     {
-        return b->size == 0;
+        return b->empty;
     }
 
     inline bool full(BucketHeader* b)
     {
-        return b->size == bucket_size;
+        return b->read == b->write && !b->empty;
     }
 
-    inline Element* last(BucketHeader* b)
+    inline Element* read(BucketHeader* b)
     {
-        return (Element*)(b + 1) + b->size - 1;
+        return (Element*)(b + 1) + b->read;
     }
 
-    inline Element* last_empty(BucketHeader* b)
+    inline Element* write(BucketHeader* b)
     {
-        return (Element*)(b + 1) + b->size;
+        return (Element*)(b + 1) + b->write;
     }
 
-    inline void check_mod(uint32_t size, uint32_t& val)
+    /**
+     * Ring buffer check.
+     */
+    inline void mod_check(uint32_t size, uint32_t& val)
     {
         if(val == size)
             val = 0;
     }
 
+    /**
+     * (Modular arithmetic) distance of (b - a)
+     * Distance in a ring buffer.
+     */
+    inline int mod_diff(uint32_t size, uint32_t a, uint32_t b)
+    {
+        if(b >= a)
+            return b - a;
+        else
+            return size - a + b;
+    }
+
     float curr_value = 0.0f;
-    uint32_t curr = 0;
+    uint32_t read_curr = 0;
+    uint32_t write_curr = 0;
 
     float interval;
     uint32_t bucket_size;

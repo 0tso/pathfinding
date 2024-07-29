@@ -59,7 +59,7 @@ build/tests --benchmarks tests/benchmarks --amount 500 --algorithms A*,JPS
 
 ### Graphs
 
-The graph below is composed of 10 000 different scenarios selected by random from all the available Starcraft 1 and Dragon Age: Origins scenarios. It measures execution time for A* and JPS.
+The graph below is composed of 10 000 different scenarios selected at random from all the available Starcraft 1 and Dragon Age: Origins scenarios. It measures execution time for A* and JPS.
 
 The x-axis is the optimal path length and the y-axis is the time it took the specific algorithm to find this optimal path.
 

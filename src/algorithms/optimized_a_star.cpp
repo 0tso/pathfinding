@@ -10,7 +10,7 @@ void OptimizedAStar::init(State* s)
     state = s;
 
     result = Algorithm::Result{};
-    open = BucketQueue<node_index>(0.1f, 16, 50);
+    open = BucketQueue<node_index>(0.1f, 30, 5);
 
     // Initialize the nodes vector.
     if(nodes.capacity() != s->map.size())
@@ -22,7 +22,7 @@ void OptimizedAStar::init(State* s)
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     Util::lazy_initialize(curr_run_id, nodes[start_index]);
     nodes[start_index].distance = 0.0f;
-    open.push(0.0f, start_index);
+    open.push(Util::euclidian_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
 }
 
 Algorithm::Result::Type OptimizedAStar::update()
@@ -41,7 +41,7 @@ Algorithm::Result::Type OptimizedAStar::update()
     if(node.status == InternalNode::Status::EXAMINED)
     {
         // Skip this node by calling the update()-function again
-        open.update_minimum();
+        open.update_write();
         return update();
     }
 
@@ -94,12 +94,12 @@ Algorithm::Result::Type OptimizedAStar::update()
 
             neighbour.status = InternalNode::Status::UNEXAMINED;
             float approx_total_path_length =
-                new_dist + Util::diagonal_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
+                new_dist + Util::euclidian_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.push(approx_total_path_length, neighbour_idx);
         }
     }
 
-    open.update_minimum();
+    open.update_write();
 
     return Result::Type::EXECUTING;
 }

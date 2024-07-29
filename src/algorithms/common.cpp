@@ -19,5 +19,5 @@ void CommonAlgorithm::init(State* s)
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     Util::lazy_initialize(curr_run_id, nodes[start_index]);
     nodes[start_index].distance = 0.0f;
-    open.emplace(0.0f, start_index);
+    open.emplace(Util::diagonal_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
 }

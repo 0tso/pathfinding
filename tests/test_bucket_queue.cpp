@@ -17,12 +17,12 @@ TEST_CASE("basic insertion & popping", "[data_structure]")
     queue.push(3.0, 0);
 
     auto e = queue.pop();
-    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.5, 0.0001));
-    REQUIRE(e.object == 61);
-    
-    e = queue.pop();
     REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.0, 0.0001));
     REQUIRE(e.object == 123);
+    
+    e = queue.pop();
+    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.5, 0.0001));
+    REQUIRE(e.object == 61);
 
     e = queue.pop();
     REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(1.1, 0.0001));
@@ -52,11 +52,11 @@ TEST_CASE("reallocation", "[data_structure]")
     REQUIRE(queue.get_realloc_amount() == 1);
 
     auto e = queue.pop();
-    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.4, 0.0001));
-    REQUIRE(e.object == 3);
+    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.0, 0.0001));
+    REQUIRE(e.object == 54);
 
     e = queue.pop();
-    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.0, 0.0001));
+    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.4, 0.0001));
 
     queue.push(1.5f, 5);
     queue.push(1.5f, 6);
@@ -67,36 +67,84 @@ TEST_CASE("reallocation", "[data_structure]")
     e = queue.pop();
     REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(0.5, 0.0001));
     e = queue.pop();
-    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(1.7, 0.0001));
-    REQUIRE(e.object == 7);
+    REQUIRE_THAT(e.value, Catch::Matchers::WithinAbs(1.5, 0.0001));
+    REQUIRE(e.object == 2);
+}
+
+TEST_CASE("repeated realloc with different buckets", "[data_structure]")
+{
+    BucketQueue<int> q{1.0f, 5, 1};
+
+    q.push(0.0f, 444);
+    q.push(0.0f, 444);
+    q.push(1.5f, 333);
+    q.update_write();
+    q.push(0.0f, 444);
+    q.push(0.1f, 444);
+    q.push(0.0f, 444);
+
+    for(int i = 0; i < 5; ++i)
+    {
+        REQUIRE(q.pop().object == 444);
+        q.update_write();
+    }
+    
+    REQUIRE(q.pop().object == 333);
+    q.update_write();
+    
+    q.push(3.512, 123);
+    REQUIRE(q.pop().object == 123);
+    REQUIRE(q.empty());
 }
 
 TEST_CASE("repeated access", "[data_structure]")
 {
     std::mt19937 gen{0};
-    std::uniform_int_distribution dist{0, 2};
-    float possibilities[] = {0.0f, 1.0f, 1.414213562f};
-    BucketQueue<unsigned int> queue{0.1, 16, 50};
-    queue.push(0.0, 0);
+    std::uniform_real_distribution dist{0.0f, 2.82842712f};
+    BucketQueue<unsigned int> queue{0.1, 30, 25};
+    queue.push(1.0, 420);
 
     float curr_val = 0.0f;
 
-    for(int i = 0; i < 5000; ++i)
+    for(int i = 0; i < 10000; ++i)
     {
-        auto [val, obj] = queue.top();
+        auto [val, obj] = queue.pop();
         REQUIRE(val > curr_val - 0.11f);
+        REQUIRE(obj == 420);
+
+        curr_val = val;
         
-        for(int i = 0; i < 5; ++i)
+        for(int i = 0; i < 4; ++i)
         {
-            queue.push(val + possibilities[dist(gen)], obj + dist(gen) - 1);
+            queue.push(val + dist(gen), 420);
         }
-        curr_val = queue.pop().value;
+        queue.update_write();
     }
 }
 
+TEST_CASE("write_curr and read_curr updated", "[data_structure]")
+{
+    BucketQueue<long long int> q{1.0f, 5, 1};
+
+    q.push(0.4f, 32);
+    q.push(4.0f, 5);
+    q.push(4.5f, -123);
+    q.push(3.1f, 215);
+
+    REQUIRE(q.pop().object == 32);
+    REQUIRE(q.pop().object == 215);
+    q.push(0.5f, 66);
+    q.update_write();
+
+    REQUIRE(q.pop().object == 66);
+    REQUIRE(q.pop().object == 5);
+    REQUIRE(q.pop().object == -123);
+    REQUIRE(q.empty());
+}
+
+
 TEST_CASE("benchmark against std::priority_queue", "[!benchmark]")
 {
-    float possibilities[] = {0.0f, 1.0f, 1.414213562f};
     int amount = 5000;
     float start = 10;
     unsigned int start_val = 0;
@@ -104,7 +152,7 @@ TEST_CASE("benchmark against std::priority_queue", "[!benchmark]")
     BENCHMARK("std::priority_queue")
     {
         std::mt19937 gen{0};
-        std::uniform_int_distribution dist{0, 2};
+        std::uniform_real_distribution dist{0.0f, 2.82842712f};
 
         std::priority_queue<std::pair<float, unsigned int>> queue;
         queue.emplace(start, start_val);
@@ -113,7 +161,7 @@ TEST_CASE("benchmark against std::priority_queue", "[!benchmark]")
             auto [val, obj] = queue.top();
             for(int i = 0; i < 5; ++i)
             {
-                queue.emplace(val + possibilities[dist(gen)], obj + dist(gen) - 1);
+                queue.emplace(val + dist(gen), obj + 1);
             }
             queue.pop();
         }
@@ -124,18 +172,18 @@ TEST_CASE("benchmark against std::priority_queue", "[!benchmark]")
     BENCHMARK("BucketQueue")
     {
         std::mt19937 gen{0};
-        std::uniform_int_distribution dist{0, 2};
+        std::uniform_real_distribution dist{0.0f, 2.82842712f};
 
-        BucketQueue<unsigned int> queue{0.1, 16, 50};
+        BucketQueue<unsigned int> queue{0.1, 30, 5};
         queue.push(start, start_val);
         for(int i = 0; i < amount; ++i)
         {
-            auto [val, obj] = queue.top();
+            auto [val, obj] = queue.pop();
             for(int i = 0; i < 5; ++i)
             {
-                queue.push(val + possibilities[dist(gen)], obj + dist(gen) - 1);
+                queue.push(val + dist(gen), obj + 1);
             }
-            queue.pop();
+            queue.update_write();
         }
         realloc = queue.get_realloc_amount();
         return queue.pop();
