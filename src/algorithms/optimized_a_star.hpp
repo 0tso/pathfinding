@@ -1,6 +1,8 @@
 #ifndef OPTIMIZED_A_STAR_HPP
 #define OPTIMIZED_A_STAR_HPP
 
+#include <string>
+
 #include "algorithms/util.hpp"
 #include "algorithms/algorithm.hpp"
 #include "algorithms/bucket_queue.hpp"
@@ -29,6 +31,8 @@ private:
     std::vector<InternalNode> nodes;
     BucketQueue<node_index> open{0.1f, 30, 5};
     uint32_t curr_run_id;
+
+    std::string curr_map_name = "";
 };
 
 #endif

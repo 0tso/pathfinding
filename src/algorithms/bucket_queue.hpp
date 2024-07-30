@@ -14,12 +14,12 @@
  *
  * Does not destruct objects!  Only use for "trivially copyable" types like int, POD, etc.
  * 
- * Assumes that the key values never decrease, only increase.
+ * Assumes that the key values never decrease, only increase (between rounds of generating successors)
  * 
  * Values can only be added within the interval [curr_value, curr_value + interval * bucket_amount]
- * This interval increases every time a bucket is depleted.
- * Designed for A* with a heuristic like euclidian distance.
- * Be careful that your heuristic doesn't ever decrease more than the movement cost changes, like with diagonal_distance.
+ * This interval potentially increases with every call to update_write().
+ * Designed for A* with a heuristic like octile distance.
+ * Be careful that your heuristic doesn't ever decrease more than the movement cost changes.
  * 
  * After every round of successor-generating, call update_write().
  * 
@@ -93,6 +93,12 @@ public:
     bool empty()
     {
         return empty(front());
+    }
+
+    Element top()
+    {
+        assert(!empty());
+        return read(front());
     }
 
     Element pop()
@@ -226,6 +232,8 @@ public:
     {
         return realloc_amount;
     }
+
+    float get_curr_value() { return curr_value; }
 
 private:
 

@@ -22,7 +22,7 @@ void OptimizedAStar::init(State* s)
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     Util::lazy_initialize(curr_run_id, nodes[start_index]);
     nodes[start_index].distance = 0.0f;
-    open.push(Util::euclidian_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
+    open.push(Util::diagonal_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
 }
 
 Algorithm::Result::Type OptimizedAStar::update()
@@ -93,7 +93,7 @@ Algorithm::Result::Type OptimizedAStar::update()
 
             neighbour.status = InternalNode::Status::UNEXAMINED;
             float approx_total_path_length =
-                new_dist + Util::euclidian_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
+                new_dist + Util::diagonal_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.push(approx_total_path_length, neighbour_idx);
         }
     }

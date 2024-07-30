@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 struct Point
 {
@@ -31,6 +32,8 @@ struct State
 
     Point begin;
     Point end;
+
+    std::string map_name;
 };
 
 #endif

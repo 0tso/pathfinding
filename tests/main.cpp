@@ -39,7 +39,7 @@ void load_map(const char* name, const char* full_path)
                 nodes.emplace_back(Node::WALL);
         }
     }
-    maps.emplace(name, State{.map = std::move(nodes), .width = width, .height = height});
+    maps.emplace(name, State{.map = std::move(nodes), .width = width, .height = height, .map_name = name});
 }
 
 void load_scenario(const Experiment& exp, int id)

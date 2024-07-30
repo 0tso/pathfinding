@@ -81,7 +81,10 @@ Otherwise it could seriously outcompete A* in large maps due to using a simple q
 
 ### Optimized A*
 The following optimizations have been applied to `OptimizedA*`:
-* [O(1) bucket queue](../src/algorithms/bucket_queue.hpp) | +40% speed
+* [O(1) bucket queue](../src/algorithms/bucket_queue.hpp) | +50% speed
+    * This bucket queue can be very simple (and hence fast) thanks to two properties of A* with consistent heuristics:
+        1. The sequence of the f-values of the expanded cells is monotonically non-decreasing.[6]
+        2. The sequence of the f-values of the expanded cells will never increase by more than by the maximum possible g(x) + h(x) change, which in case of using octile distance or euclidian distance, will never surpass 2 * sqrt(2).
 
 ### 4-way pathing instead of 8-way pathing
 The previous images and the algorithms implemented for the project assume that each node has 8 neighbours, i.e. that diagonal movement is allowed. However, in the present project diagonal movement is not allowed for nodes that have neighbouring walls in either component direction of the diagonal (so entities using the pathing are assumed to have greater than 0 size).
@@ -94,6 +97,7 @@ If a path needs to be created for agents that can only travel in cardinal direct
 3. \[Game AI Pro 2\] "JPS+: An Extreme A* Speed Optimization for Static Uniform Cost Grids", Rabin and Silva, 2015
 4. "The JPS Pathfinding System", Harabor and Grastien, 2012
 5. "Improving Jump Point Search", Harabor and Grastien, 2014
+6. "Simple Optimization Techniques for A*-Based Search", Sun et al, 2009
 
 ### Performance remarks
 I found out that the code that initializes the map state takes about 1000x more time than the pathfinding algorithms themselves for small distances; about 2000-6000 microseconds per run, which is an unacceptably long time.
