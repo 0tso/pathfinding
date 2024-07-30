@@ -215,6 +215,19 @@ namespace Util
             node = T{.last_run = run_id};
         }
     }
+
+    template<typename T>
+    void format_bidirectional_nodes(T* nodes, node_index trail, node_index start)
+    {
+        while(start != NULL_NODE_IDX)
+        {
+            T& node = nodes[start];
+            auto tmp_trail = trail;
+            trail = start;
+            start = node.prev;
+            node.prev = tmp_trail;
+        }
+    }
 }
 
 #endif

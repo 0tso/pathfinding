@@ -8,9 +8,13 @@ void OptimizedAStar::init(State* s)
 {
     curr_run_id++;
     state = s;
+    lowest_path = std::numeric_limits<float>::infinity();
+    best_start_to_mid_node = NULL_NODE_IDX;
+    best_end_to_mid_node   = NULL_NODE_IDX;
 
     result = Algorithm::Result{};
-    open.clear();
+    open_1.clear();
+    open_2.clear();
 
     // Initialize the nodes vector.
     if(nodes.capacity() != s->map.size())
@@ -18,87 +22,112 @@ void OptimizedAStar::init(State* s)
         nodes = std::vector<InternalNode>(s->map.size());
     }
     
-    // Set the correct information of the starting node and add it to the open queue.
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     Util::lazy_initialize(curr_run_id, nodes[start_index]);
-    nodes[start_index].distance = 0.0f;
-    open.push(Util::diagonal_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
+    nodes[start_index].distance_1 = 0.0f;
+    open_1.push(Util::diagonal_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
+
+    auto end_index = Util::flatten(s->width, s->end.x, s->end.y);
+    Util::lazy_initialize(curr_run_id, nodes[end_index]);
+    nodes[end_index].distance_2 = 0.0f;
+    open_2.push(Util::diagonal_distance(state->end.x, state->end.y, state->begin.x, state->begin.y), end_index);
 }
 
 Algorithm::Result::Type OptimizedAStar::update()
 {
-    if(open.empty())
+    for(bool start : {true, false})
     {
-        result.type = Result::Type::FAILURE;
-        return Result::Type::FAILURE;
-    }
-
-    auto [approx_dist, node_idx] = open.pop();
-
-    auto [x, y] = Util::expand(state->width, node_idx);
-    auto& node = nodes[node_idx];
-
-    if(node.status == InternalNode::Status::EXAMINED)
-    {
-        // Skip this node by calling the update()-function again
-        open.update_write();
-        return update();
-    }
-
-    node.status = InternalNode::Status::EXAMINED;
-    result.expanded++;
-
-    // Is the current node the first node? If not, set it to EXPANDED
-    if(node.prev != std::numeric_limits<node_index>::infinity())
-    {
-        state->map[node_idx] = Node::EXPANDED;
-    }
-
-    std::pair<node_index, dir_t> neighbours[8];
-    auto amount_neighbours = Util::get_neighbours(neighbours, *state, x, y);
-
-    for(int i = 0; i < amount_neighbours; ++i)
-    {
-        auto [neighbour_idx, dir] = neighbours[i];
-        auto& neighbour = nodes[neighbour_idx];
-        Util::lazy_initialize(curr_run_id, neighbour);
-        auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
-        
-        // All perpendicular neighbours are one unit of distance away
-        // and all the diagonal neigbours are sqrt(2) units of distance away.
-        float new_dist = node.distance + (dir->straight ? 1.0f : SQRT_2);
-        if(new_dist < neighbour.distance)
+        if(open_1.empty() || open_2.empty())
         {
-            // We have found a new, more optimized way to reach this node.
-            // Therefore we should expand this node again later.
-            // The used heuristic is manhattan distance |x1 - x2| + |y1 - y2|.
-
-            neighbour.distance = new_dist;
-            neighbour.prev = node_idx;
-
-            // Check if the neigbour is the end
-            if(neighbour_x == state->end.x && neighbour_y == state->end.y)
+            // End of execution
+            if(lowest_path == std::numeric_limits<float>::infinity())
             {
-                // End & path found!
-                Util::build_path<InternalNode>(*state, &nodes[0], result);
-                result.length = neighbour.distance;
-                result.type = Result::Type::SUCCESS;
-
-                return Result::Type::SUCCESS;
-            }
-            else
-            {
-                state->map[neighbour_idx] = Node::EXAMINED;
+                result.type = Result::Type::FAILURE;
+                return Result::Type::FAILURE;
             }
 
-            neighbour.status = InternalNode::Status::UNEXAMINED;
-            float approx_total_path_length =
-                new_dist + Util::diagonal_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
-            open.push(approx_total_path_length, neighbour_idx);
+            Util::format_bidirectional_nodes(&nodes[0], best_start_to_mid_node, best_end_to_mid_node);
+            Util::build_path(*state, &nodes[0], result);
+            result.length = lowest_path;
+            result.type = Result::Type::SUCCESS;
+            return result.type;
         }
-    }
 
-    open.update_write();
+        auto& open          = start ? open_1                    : open_2;
+        auto dist_ptr       = start ? &InternalNode::distance_1 : &InternalNode::distance_2;
+        auto other_dist_ptr = start ? &InternalNode::distance_2 : &InternalNode::distance_1;
+        auto other_top      = start ? open_2.top().value        : open_1.top().value;
+
+        auto heuristic = [this](bool s, int x, int y) -> float
+        {
+            if(s)
+                return Util::diagonal_distance(x, y, this->state->end.x, this->state->end.y);
+            else
+                return Util::diagonal_distance(x, y, this->state->begin.x, this->state->begin.y);
+        };
+
+        auto [approx_dist, node_idx] = open.pop();
+
+        auto [x, y] = Util::expand(state->width, node_idx);
+        auto& node = nodes[node_idx];
+
+        if(node.status == InternalNode::EXAMINED)
+        {
+            // Skip this node by calling the update()-function again
+            open.update_write();
+            return update();
+        }
+
+        node.status = InternalNode::EXAMINED;
+        result.expanded++;
+
+        // Is the current node the first node? If not, set it to EXPANDED
+        if(node.prev != std::numeric_limits<node_index>::infinity())
+        {
+            state->map[node_idx] = Node::EXPANDED;
+        }
+
+        std::pair<node_index, dir_t> neighbours[8];
+        auto amount_neighbours = Util::get_neighbours(neighbours, *state, x, y);
+
+        for(int i = 0; i < amount_neighbours; ++i)
+        {
+            auto [neighbour_idx, dir] = neighbours[i];
+            auto& neighbour = nodes[neighbour_idx];
+            Util::lazy_initialize(curr_run_id, neighbour);
+            auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
+            
+            float new_dist = node.*dist_ptr + (dir->straight ? 1.0f : SQRT_2);
+            
+            if(new_dist + neighbour.*other_dist_ptr < lowest_path)
+            {
+                best_start_to_mid_node = start ? node_idx      : neighbour_idx;
+                best_end_to_mid_node   = start ? neighbour_idx : node_idx;
+                lowest_path            = new_dist + neighbour.*other_dist_ptr;
+            }
+
+            if(new_dist < neighbour.*dist_ptr)
+            {
+                neighbour.*dist_ptr = new_dist;
+
+                if(neighbour.*other_dist_ptr == std::numeric_limits<float>::infinity())
+                {
+                    neighbour.prev = node_idx;
+
+                    float f = new_dist + heuristic(start, neighbour_x, neighbour_y);
+
+                    if(!(lowest_path <= f
+                    || lowest_path <= new_dist + other_top - heuristic(!start, neighbour_x, neighbour_y)))
+                    {
+                        neighbour.status = InternalNode::Status::UNEXAMINED;
+                        open.push(f, neighbour_idx);
+                        state->map[neighbour_idx] = Node::EXAMINED;
+                    }
+                }
+            }
+        }
+        open.update_write();
+    }
 
     return Result::Type::EXECUTING;
 }

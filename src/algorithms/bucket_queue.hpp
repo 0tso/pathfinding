@@ -98,7 +98,7 @@ public:
     Element top()
     {
         assert(!empty());
-        return read(front());
+        return *read(front());
     }
 
     Element pop()

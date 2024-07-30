@@ -46,8 +46,6 @@ private:
     float lowest_end_distance;
 
     void recursive_update(node_index idx, bool start);
-
-    void format_path_nodes();
 };
 
 #endif

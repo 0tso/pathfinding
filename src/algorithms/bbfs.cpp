@@ -118,7 +118,7 @@ Algorithm::Result::Type BBFS::update()
     if(lowest_start_distance + lowest_end_distance > best_path_distance)
     {
         // End found!
-        format_path_nodes();
+        Util::format_bidirectional_nodes(&nodes[0], best_start_to_mid_node, best_end_to_mid_node);
         Util::build_path<BBFSInternal>(*state, &nodes[0], result);
         result.length = best_path_distance;
         result.type = Result::Type::SUCCESS;
@@ -127,20 +127,6 @@ Algorithm::Result::Type BBFS::update()
     }
 
     return Algorithm::Result::EXECUTING;
-}
-
-void BBFS::format_path_nodes()
-{
-    auto prev = best_start_to_mid_node;
-    auto end_side = best_end_to_mid_node;
-    while(end_side != NULL_NODE_IDX)
-    {
-        auto& end_side_node = nodes[end_side];
-        auto temp_curr = end_side;
-        end_side = end_side_node.prev;
-        end_side_node.prev = prev;
-        prev = temp_curr;
-    }
 }
 
 void BBFS::recursive_update(node_index idx, bool start)
