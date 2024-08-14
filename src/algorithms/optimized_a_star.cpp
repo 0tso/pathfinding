@@ -85,7 +85,7 @@ Algorithm::Result::Type OptimizedAStar::update()
             result.expanded++;
 
             // Is the current node the first node? If not, set it to EXPANDED
-            if(node.prev != std::numeric_limits<node_index>::infinity())
+            if(node.prev != NULL_NODE_IDX)
             {
                 state->map[node_idx] = Node::EXPANDED;
             }

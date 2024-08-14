@@ -57,7 +57,7 @@ Algorithm::Result::Type BBFS::update()
             else
                 lowest_end_distance = std::min(lowest_end_distance, node.distance);
 
-            if(node.prev != std::numeric_limits<node_index>::infinity())
+            if(node.prev != NULL_NODE_IDX)
             {
                 state->map[node_idx] = Node::EXPANDED;
             }

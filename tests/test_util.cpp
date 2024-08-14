@@ -101,3 +101,79 @@ TEST_CASE("heuristic functions", "[maths]")
     auto diagonal_heuristic = diagonal_distance(0, 0, 3, 3);
     REQUIRE_THAT(diagonal_heuristic, Catch::Matchers::WithinAbs(3 * std::sqrt(2), 0.0001));
 }
+
+TEST_CASE("building path", "[map]")
+{
+    State s = {
+        .map = {Node::WALL, Node::UNVISITED, Node::START,
+                Node::UNVISITED, Node::UNVISITED, Node::WALL,
+                Node::UNVISITED, Node::UNVISITED, Node::END},
+        .width = 3,
+        .height = 3,
+        .begin = {2, 0},
+        .end = {2, 2}
+    };
+
+    struct InternalNode
+    {
+        node_index prev = NULL_NODE_IDX;
+    };
+
+    InternalNode nodes[9];
+
+    nodes[8].prev = 7;
+    nodes[7].prev = 4;
+    nodes[4].prev = 1;
+    nodes[1].prev = 2;
+
+    Algorithm::Result res;
+    auto& path = res.path;
+    Util::build_path(s, nodes, res);
+
+    REQUIRE(path.size() == 4);
+
+    REQUIRE(path[0].x == 1);
+    REQUIRE(path[0].y == 0);
+
+    REQUIRE(path[1].x == 1);
+    REQUIRE(path[1].y == 1);
+
+    REQUIRE(path[2].x == 1);
+    REQUIRE(path[2].y == 2);
+
+    REQUIRE(path[3].x == 2);
+    REQUIRE(path[3].y == 2);
+}
+
+TEST_CASE("bidirectional node formatting", "[map]")
+{
+    struct I
+    {
+        node_index prev = NULL_NODE_IDX;
+
+        bool operator==(const I& p) const = default;
+        bool operator!=(const I& p) const = default;
+    };
+
+    I nodes[12] =
+    {
+        NULL_NODE_IDX, 0, 1,
+        4, 5, 2,
+        7, 8, 11,
+        NULL_NODE_IDX, 9, 10
+    };
+
+    I target[12] =
+    {
+        NULL_NODE_IDX, 0, 1,
+        4, 5, 2,
+        3, 6, 7,
+        10, 11, 8
+    };
+
+    Util::format_bidirectional_nodes(nodes, 3, 6);
+    for(int i = 0; i < 12; ++i)
+    {
+        REQUIRE(nodes[i] == target[i]);
+    }
+}

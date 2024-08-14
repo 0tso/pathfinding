@@ -14,7 +14,7 @@
  * Represents an index into a flat array of nodes.
  */
 typedef size_t node_index;
-constexpr node_index NULL_NODE_IDX = std::numeric_limits<node_index>::infinity();
+constexpr node_index NULL_NODE_IDX = std::numeric_limits<node_index>::max();
 
 /**
  * Square root of two rounded upwards.
@@ -217,15 +217,15 @@ namespace Util
     }
 
     template<typename T>
-    void format_bidirectional_nodes(T* nodes, node_index trail, node_index start)
+    void format_bidirectional_nodes(T* nodes, node_index forward_head, node_index backward_head)
     {
-        while(start != NULL_NODE_IDX)
+        while(backward_head != NULL_NODE_IDX)
         {
-            T& node = nodes[start];
-            auto tmp_trail = trail;
-            trail = start;
-            start = node.prev;
-            node.prev = tmp_trail;
+            T& node = nodes[backward_head];
+            auto next_backward_head = node.prev;
+            node.prev = forward_head;
+            forward_head = backward_head;
+            backward_head = next_backward_head;
         }
     }
 }
