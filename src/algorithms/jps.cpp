@@ -60,7 +60,7 @@ Algorithm::Result::Type JumpPointSearch::update()
     // Is the current node the first node? If not, set it to EXPANDED
     if(node.prev != NULL_NODE_IDX)
     {
-        state->map[node_idx] = Node::EXPANDED;
+        state->map[node_idx] = Node::EXPANDED_1;
     }
 
     std::pair<node_index, dir_t> neighbours[8];
@@ -107,11 +107,11 @@ void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
 
     if(x == state->end.x && y == state->end.y)
     {
-        add_to_open();
+        open.emplace(0.0f, node_idx);
         return;
     }
 
-    state->map[node_idx] = Node::EXAMINED;
+    state->map[node_idx] = Node::EXAMINED_1;
 
     if(dir->straight)
     {

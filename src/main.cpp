@@ -23,9 +23,10 @@ void remove_temp(State& state)
 {
     for(int i = 0; i < state.height * state.width; ++i)
     {
-        if(state.map[i] == Node::EXPANDED
-        || state.map[i] == Node::EXAMINED
-        || state.map[i] == Node::PATH)
+        if(state.map[i] != UNVISITED
+        && state.map[i] != WALL
+        && state.map[i] != START
+        && state.map[i] != END)
         {
             state.map[i] = Node::UNVISITED;
         }
@@ -164,14 +165,14 @@ void render_loop(sf::RenderWindow* window, State* state, std::mutex* mut)
 
 void pathfinding_loop(Algorithm* algo,
                         State* state, State* render_state,
-                        std::mutex* render_mut, std::chrono::duration<int, std::milli> sleep_time)
+                        std::mutex* render_mut, std::chrono::duration<int, std::micro> sleep_time)
 {
     sf::Clock timer;
     algo->init(state);
     Algorithm::Result::Type res;
     while((res = algo->update()) == Algorithm::Result::Type::EXECUTING)
     {
-        if(sleep_time != std::chrono::duration<int, std::milli>::zero())
+        if(sleep_time != std::chrono::duration<int, std::micro>::zero())
         {
             render_mut->lock();
             render_state->map = state->map;
@@ -249,14 +250,14 @@ void console_loop(sf::RenderWindow* window, State* render_state, std::mutex* ren
                 continue;
             }
 
-            std::chrono::duration<int, std::milli> sleep_duration;
+            std::chrono::duration<int, std::micro> sleep_duration;
             std::string str;
             if( (str = get_next_token()).empty())
             {
                 sleep_duration = std::chrono::duration<int, std::milli>::zero();
             } else
             {
-                sleep_duration = std::chrono::milliseconds(std::stoi(str));
+                sleep_duration = std::chrono::microseconds(std::stoi(str));
             }
             pathfinding = true;
             pathfinding_loop(algo, &global_state, render_state, render_update_mutex, sleep_duration);

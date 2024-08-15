@@ -30,7 +30,7 @@ There are multiple command line options to input **after** starting the program:
 * `JPS`
 * `BBFS`
 
-One optional command line argument can be given: the amount of milliseconds (integer) to wait after each pathfinding logic update. This is useful for visualization.
-* Example: `start A* 5` starts pathfinding with A* and waits 5 milliseconds between each pathfinding update.
+One optional command line argument can be given: the amount of microseconds (integer) to wait after each pathfinding logic update. This is useful for visualization.
+* Example: `start A* 5000` starts pathfinding with A* and waits 5 milliseconds between each pathfinding update.
 
 <hr>

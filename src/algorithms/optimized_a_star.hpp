@@ -16,17 +16,19 @@ public:
 private:
     struct InternalNode
     {
-        enum Status : bool
+        enum Status : uint8_t
         {
-            UNEXAMINED,
-            EXAMINED
+            FREE,
+            EXAMINED_1,
+            EXAMINED_2,
+            RE_1,
+            RE_2
         };
 
-        float distance_1    = std::numeric_limits<float>::infinity(); 
-        float distance_2    = std::numeric_limits<float>::infinity();
-        node_index prev     = NULL_NODE_IDX;
-        uint32_t last_run   = 1;
-        Status status       = Status::UNEXAMINED;
+        node_index prev   = NULL_NODE_IDX;
+        float distance    = std::numeric_limits<float>::infinity(); 
+        uint32_t last_run = 1;
+        Status status     = Status::FREE;
     };
 
     std::vector<InternalNode> nodes;

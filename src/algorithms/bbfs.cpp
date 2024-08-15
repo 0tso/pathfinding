@@ -59,7 +59,7 @@ Algorithm::Result::Type BBFS::update()
 
             if(node.prev != NULL_NODE_IDX)
             {
-                state->map[node_idx] = Node::EXPANDED;
+                state->map[node_idx] = Node::EXPANDED_1;
             }
 
             auto amount_neighbours = Util::get_neighbours(neighbours, *state, x, y);
@@ -94,7 +94,7 @@ Algorithm::Result::Type BBFS::update()
                         q.push(neighbour_idx);
                         neighbour.status = start ? BBFSInternal::Status::SEARCHED_START : BBFSInternal::SEARCHED_END;
 
-                        state->map[neighbour_idx] = Node::EXAMINED;
+                        state->map[neighbour_idx] = Node::EXAMINED_1;
                     }
                     else
                     {

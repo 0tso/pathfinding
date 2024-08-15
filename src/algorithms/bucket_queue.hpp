@@ -139,7 +139,7 @@ public:
             curr_value = value;
         }
 
-        assert(value >= curr_value - 0.01f);
+        assert(value >= curr_value - interval + 0.01f);
 
         uint32_t index = (write_curr + (uint32_t)((value - curr_value) / interval)) % bucket_amount;
 

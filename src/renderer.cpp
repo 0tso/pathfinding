@@ -22,8 +22,12 @@ namespace Renderer
         sf::Color::Black,
         sf::Color::Blue,
         sf::Color::Red,
-        sf::Color{75, 75, 75},
-        sf::Color{150, 150, 150},
+
+        sf::Color{50, 25, 90},
+        sf::Color{100, 25, 90},
+
+        sf::Color{210, 110, 240},
+        sf::Color{240, 110, 240},
         sf::Color::Yellow
     };
 

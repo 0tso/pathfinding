@@ -222,7 +222,7 @@ namespace Util
         while(backward_head != NULL_NODE_IDX)
         {
             T& node = nodes[backward_head];
-            auto next_backward_head = node.prev;
+            node_index next_backward_head = node.prev;
             node.prev = forward_head;
             forward_head = backward_head;
             backward_head = next_backward_head;

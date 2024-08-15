@@ -24,12 +24,12 @@ void OptimizedAStar::init(State* s)
     
     auto start_index = Util::flatten(s->width, s->begin.x, s->begin.y);
     Util::lazy_initialize(curr_run_id, nodes[start_index]);
-    nodes[start_index].distance_1 = 0.0f;
+    nodes[start_index].distance = 0.0f;
     open_1.push(Util::diagonal_distance(state->begin.x, state->begin.y, state->end.x, state->end.y), start_index);
 
     auto end_index = Util::flatten(s->width, s->end.x, s->end.y);
     Util::lazy_initialize(curr_run_id, nodes[end_index]);
-    nodes[end_index].distance_2 = 0.0f;
+    nodes[end_index].distance = 0.0f;
     open_2.push(Util::diagonal_distance(state->end.x, state->end.y, state->begin.x, state->begin.y), end_index);
 }
 
@@ -57,9 +57,11 @@ Algorithm::Result::Type OptimizedAStar::update()
             }
 
             auto& open          = start ? open_1                    : open_2;
-            auto dist_ptr       = start ? &InternalNode::distance_1 : &InternalNode::distance_2;
-            auto other_dist_ptr = start ? &InternalNode::distance_2 : &InternalNode::distance_1;
             auto other_top      = start ? open_2.top().value        : open_1.top().value;
+            auto EXAMINED       = start ? InternalNode::EXAMINED_1  : InternalNode::EXAMINED_2;
+            auto OTHER_EXAMINED = start ? InternalNode::EXAMINED_2  : InternalNode::EXAMINED_1;
+            auto RE             = start ? InternalNode::RE_1        : InternalNode::RE_2;
+            auto OTHER_RE       = start ? InternalNode::RE_2        : InternalNode::RE_1;
 
             auto heuristic = [this](bool s, int x, int y) -> float
             {
@@ -74,20 +76,20 @@ Algorithm::Result::Type OptimizedAStar::update()
             auto [x, y] = Util::expand(state->width, node_idx);
             auto& node = nodes[node_idx];
 
-            if(node.status == InternalNode::EXAMINED)
+            if(node.status == EXAMINED)
             {
                 // Skip this node by looping again
                 open.update_write();
                 continue;
             }
 
-            node.status = InternalNode::EXAMINED;
+            node.status = EXAMINED;
             result.expanded++;
 
             // Is the current node the first node? If not, set it to EXPANDED
             if(node.prev != NULL_NODE_IDX)
             {
-                state->map[node_idx] = Node::EXPANDED;
+                state->map[node_idx] = start ? Node::EXPANDED_1 : Node::EXPANDED_2;
             }
 
             std::pair<node_index, dir_t> neighbours[8];
@@ -100,34 +102,32 @@ Algorithm::Result::Type OptimizedAStar::update()
                 Util::lazy_initialize(curr_run_id, neighbour);
                 auto [neighbour_x, neighbour_y] = Util::expand(state->width, neighbour_idx);
                 
-                float new_dist = node.*dist_ptr + (dir->straight ? 1.0f : SQRT_2);
+                float new_dist = node.distance + (dir->straight ? 1.0f : SQRT_2);
                 
-                if(new_dist + neighbour.*other_dist_ptr < lowest_path)
+                if(neighbour.status == OTHER_EXAMINED || neighbour.status == OTHER_RE)
                 {
-                    best_start_to_mid_node = start ? node_idx      : neighbour_idx;
-                    best_end_to_mid_node   = start ? neighbour_idx : node_idx;
-                    lowest_path            = new_dist + neighbour.*other_dist_ptr;
-                }
-
-                if(new_dist < neighbour.*dist_ptr)
-                {
-                    neighbour.*dist_ptr = new_dist;
-
-                    if(neighbour.*other_dist_ptr == std::numeric_limits<float>::infinity())
+                    if(new_dist + neighbour.distance < lowest_path)
                     {
-                        neighbour.prev = node_idx;
-
-                        float f = new_dist + heuristic(start, neighbour_x, neighbour_y);
-
-                        if(!(lowest_path <= f
-                        || lowest_path <= new_dist + other_top - heuristic(!start, neighbour_x, neighbour_y)))
-                        {
-                            neighbour.status = InternalNode::Status::UNEXAMINED;
-                            open.push(f, neighbour_idx);
-                            state->map[neighbour_idx] = Node::EXAMINED;
-                        }
+                        lowest_path = new_dist + neighbour.distance;
+                        best_start_to_mid_node = start ? node_idx : neighbour_idx;
+                        best_end_to_mid_node   = start ? neighbour_idx : node_idx;
                     }
                 }
+                else if(new_dist < neighbour.distance)
+                {
+                    neighbour.distance = new_dist;
+                    neighbour.prev = node_idx;
+                    float f = new_dist + heuristic(start, neighbour_x, neighbour_y);
+
+                    if(!(lowest_path <= f
+                    || lowest_path <= new_dist + other_top - heuristic(!start, neighbour_x, neighbour_y)))
+                    {
+                        neighbour.status = RE;
+                        open.push(f, neighbour_idx);
+                        state->map[neighbour_idx] = start ? Node::EXAMINED_1 : Node::EXAMINED_2;
+                    }
+                }
+
             }
             open.update_write();
             break;

@@ -17,12 +17,14 @@ struct Point
 enum Node : uint8_t
 {
     UNVISITED   = 0,
-    WALL        = 1,
-    START       = 2,
-    END         = 3,
-    EXPANDED    = 4,
-    EXAMINED    = 5,
-    PATH        = 6
+    WALL,
+    START,
+    END,
+    EXPANDED_1,
+    EXPANDED_2,
+    EXAMINED_1,
+    EXAMINED_2,
+    PATH
 };
 
 struct State
