@@ -22,6 +22,7 @@ public:
         std::vector<Point> path;
         float length = 0;
         int expanded = 0;
+        int examined = 0;
     };
 
     /**

@@ -84,21 +84,3 @@ int Util::get_neighbours(std::pair<node_index, dir_t>* buffer, const State& stat
     }
     return amount_neighbours;
 }
-
-const Direction* Util::get_direction(int x1, int y1, int x2, int y2)
-{
-    int x_d = std::clamp(x2 - x1, -1, 1);
-    int y_d = std::clamp(y2 - y1, -1, 1);
-
-    if(x_d > 0)
-    {
-        return directions[Direction::EAST + y_d];
-    }
-    if(x_d == 0)
-    {
-        return y_d > 0 ? directions[Direction::SOUTH] : directions[Direction::NORTH];
-    }
-
-    // d_x < 0
-    return directions[Direction::WEST - y_d];
-}

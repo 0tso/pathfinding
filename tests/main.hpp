@@ -22,4 +22,6 @@ extern std::vector<std::pair<std::string, Algorithm*>> algos;
 extern std::vector<Scenario> scenarios;
 extern std::unordered_map<std::string, State> maps;
 
+void load_map(const char* name, const char* full_path);
+
 #endif

@@ -74,6 +74,8 @@ Algorithm::Result::Type AStar::update()
                 new_dist + Util::diagonal_distance(neighbour_x, neighbour_y, state->end.x, state->end.y);
             open.emplace(approx_total_path_length, neighbour_idx);
         }
+
+        result.examined++;
     }
 
     return Result::Type::EXECUTING;

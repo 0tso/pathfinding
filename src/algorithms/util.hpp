@@ -92,14 +92,6 @@ namespace Util
     bool is_move_valid(const State& state, int x, int y, dir_t dir);
 
     /**
-     * Returns the direction from (x1, y1) to (x2, y2).
-     * Only designed for neighbours, but also somewhat works for farther-away nodes.
-     * 
-     * Northeast is assumed to be (1, -1).
-     */
-    dir_t get_direction(int x1, int y1, int x2, int y2);
-
-    /**
      * Flattens the input coordinates (x, y) to single-dimensional array coordinates.
      */
     inline int flatten(int width, int x, int y)

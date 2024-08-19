@@ -59,11 +59,11 @@ The image below (_taken from source [3], same as above but modified_) demonstrat
 
 The red circles are jump points due to the new obstacle (black square) introduced. The obstacle prevents the scan from advancing to nodes that the jump point with forced neighbours (1) can explore. In jump point number 2, the path from the centre changes to reach jump point number 1, therefore adhering to case 2.
 
-Though in the original paper [2] both are regarded as nodes of equal importance, the jump points of type 2 (only diagonal nodes) need not even be added into the priority queue if the scan is continued past them, which doesn't happen in the original paper [2].
+Though in the original paper [2] both are regarded as nodes of equal importance, the jump points of type 2 (only diagonal nodes) need not even be added into the priority queue if the scan is continued past them.
 This is because all nodes reachable from them are already explored during the original complete scan.
 As the picture shows, all nodes that a new scan from node 2 would explore are already explored with equal or smaller distance from the original node.
 Therefore only jump nodes of type 1 need to be added to the priority queue.
-This approach is argued for in source [5], a later article on improving JPS by its original creators.
+This approach is argued for in source [5], a later article on improving JPS by its original creators. This method is also used in this project: the scan is continued past jump points of type 2, only stopping at type 1 jump points.
 
 In any case, this significant reduction in priority queue modifications in large areas accounts for the other 50% speed increase JPS has over pure A* according to [3].
 

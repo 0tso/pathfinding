@@ -3,16 +3,31 @@
 The project uses [Catch2](https://github.com/catchorg/Catch2) for unit tests.
 When building tests using the `tests` CMake preset, Catch2 is pulled from Github using CMake's FetchContent and compiled.
 
-Instructions for building and running tests are in the main [README.md](../README.md) file.
+To build and execute the tests (provided in the [tests](./tests/) folder), run the following commands:
+```
+cmake --preset=tests
+cmake --build build --config Release --target tests
+build/tests
+```
+
+Please execute the tests from the project root directory, as the path of the needed `test_map.map` is built from the current working directory. You can also execute them within any directory with that file. The C++ standard library contains no way to get the executable path.
 
 ## Unit tests
 
 The following modules are unit tested extensively:
-* [Util](../src/algorithms/util.hpp) ----> [test_util.cpp](../tests/test_util.cpp)
+* [Util](../src/algorithms/util.hpp) ----> [test_util.cpp](../tests/test_util.cpp) (covers 97,9% of lines)
+* [A*](../src/algorithms/a_star.cpp) ----> [test_algorithms.cpp](../tests/test_algorithms.cpp)  (covers 94,4% of lines)
+* [JPS](../src/algorithms/jps.cpp)   ----> [test_algorithms.cpp](../tests/test_algorithms.cpp) (covers 95,2% of lines)
+* [BucketQueue](../src/algorithms/bucket_queue.hpp) ----> [test_bucket_queue.cpp](../tests/test_bucket_queue.cpp) (covers 97,3% of lines)
 
 The individual tested items can be read from the `SECTION` names of the test files.
 
 In addition to unit tests, the pathfinding algorithms have been verified to find the shortest path in several `.scen` files and 10 000 scenarios through benchmarking (which automatically checks that the found path and the optimal path match). Benchmarking is covered in the next section.
+
+## Coverage report
+To generate a HTML coverage report, download `gcovr`. After downloading, copy the `tests/test_map.map` into the `build` folder and compile the project with the preset `coverage` and target `pathfinding_coverage`. A coverage report will then be produced in the `build/pathfinding_coverage` directory.
+
+The current coverage report statistics are listed in the [previous section](#unit-tests).
 
 ## Benchmarks
 For running benchmarks, download maps (`.map`) and scenario files (`.scen`) from https://movingai.com/benchmarks/grids.html.

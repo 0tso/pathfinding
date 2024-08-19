@@ -12,9 +12,9 @@ For a more detailed look at how the aforementioned algorithms work, see [structu
 For graphs of how they perform against each other, see [testing_and_benchmarks.md](./docs/testing_and_benchmarks.md).
 
 ## Prerequisites
-The following programs must be installed before building the application (the italicized programs are installed by default on Ubuntu):
-* (_A C++ compiler like GCC_)
-* (_Make (for building)_)
+The following programs must be installed before building the application:
+* A C++ compiler like GCC
+* Make (for building)
 * [CMake](https://cmake.org/) (for build automation & generation)
 
 If you want to use a C++ package manager, install [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started).
@@ -42,14 +42,9 @@ In case of [missing system dependencies](https://learn.microsoft.com/en-us/vcpkg
 
 After building, the executable `pathfinding_visualizer` can be found and executed in the newly created `build` subdirectory.
 
-## Tests & benchmarks
-To build and execute the tests (provided in the [tests](./tests/) folder), run the following commands:
-```
-cmake --preset=tests
-cmake --build build --config Release --target tests
-./build/tests
-```
-For benchmarking, see [testing_and_benchmarks.md](./docs/testing_and_benchmarks.md).
-
 ## Documentation
 Documentation provided in the [docs](./docs/) folder.
+
+* [Usage instructions](./docs/usage_instructions.md)
+* [Program & algorithm structure](./docs/structure.md)
+* [Testing & benchmarks](./docs/testing_and_benchmarks.md)

@@ -79,6 +79,8 @@ Algorithm::Result::Type JumpPointSearch::update()
 
 void JumpPointSearch::jump(node_index prev, dir_t dir, float distance)
 {
+    result.examined++;
+
     auto [old_x, old_y] = Util::expand(state->width, prev);
 
     int x = old_x + dir->movement.first;
