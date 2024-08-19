@@ -15,7 +15,9 @@
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "BUILD_TESTS": "FALSE",
+                "ADD_COVERAGE": "FALSE"
             }
         },
         {
@@ -32,7 +34,8 @@
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "BUILD_TESTS": "TRUE"
+                "BUILD_TESTS": "TRUE",
+                "ADD_COVERAGE": "FALSE"
             }
         },
         {

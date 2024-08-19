@@ -95,7 +95,9 @@ Due to the existence of this point and the fact that JPS seems much more inconsi
 
 ## Attributions
 
-The program uses a modified version of the scenario and map loading functionalities of the [HOG2](https://github.com/nathansttt/hog2) project. Modification had to be done to remove dependencies on OpenGL and other parts of HOG2. These files are:
+The coverage report generation uses the following CMake module: [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake).
+
+The tests & benchmarks use a modified version of the scenario and map loading functionalities of the [HOG2](https://github.com/nathansttt/hog2) project. Modification had to be done to remove dependencies on OpenGL and other parts of HOG2. These files are:
 * [Map.h](../tests/hog2/Map.h)
 * [Map.cpp](../tests/hog2/Map.cpp)
 * [ScenarioLoader.h](../tests/hog2/ScenarioLoader.h)

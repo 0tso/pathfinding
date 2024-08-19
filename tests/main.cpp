@@ -42,8 +42,13 @@ void load_map(const char* name, const char* full_path)
     maps.emplace(name, State{.map = std::move(nodes), .width = width, .height = height, .map_name = name});
 }
 
-void load_scenario(const Experiment& exp, int id)
+bool load_scenario(const Experiment& exp, int id)
 {
+    if(exp.GetStartX() == exp.GetGoalX() && exp.GetStartY() == exp.GetGoalY())
+    {
+        return false;
+    }
+
     auto map = exp.GetMapName();
     if(!maps.contains(map))
     {
@@ -58,6 +63,8 @@ void load_scenario(const Experiment& exp, int id)
         .optimal_length = (float)exp.GetDistance(),
         .id = id
     });
+
+    return true;
 }
 
 int main(int argc, char** argv)
@@ -139,7 +146,7 @@ int main(int argc, char** argv)
                         if(!dist(gen))
                             continue;
 
-                        load_scenario(loader.GetNthExperiment(i), i);
+                        while(!load_scenario(loader.GetNthExperiment(i), i)) {}
 
                         if(scenarios.size() == benchmark_amount)
                             goto benchmark;
